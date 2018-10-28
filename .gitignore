@@ -1,5 +1,5 @@
 __pycache__/
 secrets.py
 log.txt
-data.dat
+data.*
 production.py
