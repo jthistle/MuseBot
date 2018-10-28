@@ -30,7 +30,6 @@ COMMANDS = ["mute", "unmute"]
 
 MUSESCORE_NODE_URL = "https://musescore.org/node/"
 GITHUB_PULL_URL = "https://github.com/musescore/MuseScore/pull/"
-MAX_PULL_ID = 10000
 
 con = http.client.HTTPSConnection(URL, 443)	# gives HTTPS
 
@@ -143,6 +142,7 @@ while True:
 
 			parseNumber = False
 			parseCommand = False
+			forcePr = False
 			currentCmd = ""
 			currentNum = ""
 			for i in range(len(text)):
@@ -150,6 +150,9 @@ while True:
 				if char == "#":
 					if not isMuted:
 						parseNumber = True
+						if i-2 >= 0:
+							if text[i-2:i].lower() == "pr":
+								forcePr = True
 				elif char == "/":
 					if i == 0:
 						parseCommand = True
@@ -179,16 +182,19 @@ while True:
 						if currentNum != "":
 							finalNum = int(currentNum)
 							debug("Looking for issue/node #{}".format(currentNum))
+							found = False
 
-							if finalNum > MAX_PULL_ID:
-								# Look for a MuseScore.org node
+							# First, look for a MuseScore.org node
+							if not forcePr:
 								urlToCheck = MUSESCORE_NODE_URL+currentNum
 								if checkExists(urlToCheck):
 									msg = "Node #{}: {}".format(finalNum, urlToCheck)
 									sendMessage(msg, channel)
+									found = True
 								else:
-									debug("Couldn't find node #{}".format(finalNum))
-							else:
+									debug("Couldn't find node #{}, will look for PR".format(finalNum))
+							
+							if not found:
 								# Look for a github issue
 								urlToCheck = GITHUB_PULL_URL+currentNum
 								if checkExists(urlToCheck):
@@ -200,5 +206,6 @@ while True:
 						# Cleanup
 						currentNum = ""
 						parseNumber = False
+						forcePr = False
 
 	time.sleep(REQUEST_DELAY)
