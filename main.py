@@ -9,7 +9,7 @@ import datetime
 import shelve
 
 try:
-	import production
+	from production import *
 except ImportError:
 	# We aren't running on a production server, so
 	# use default values.
