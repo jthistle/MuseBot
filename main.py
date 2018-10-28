@@ -14,7 +14,7 @@ REQUEST_DELAY = 1	# second to wait between requests
 HEADERS = {'Content-type': 'application/json'}
 HTTP_ERRORS_FATAL = True
 DEBUG = True
-DEBUG_TO_FILE = True
+DEBUG_TO_FILE = False
 DEBUG_FILE = "log.txt"
 DEBUG_LEVELS = ["debug", "notice", "warning", "error"]
 
@@ -147,11 +147,10 @@ while True:
 					if i == 0:
 						parseCommand = True
 				elif parseCommand:
-					if char == " ":
+					if char in (" ", "@"):
 						# Handle command
 						cmd = currentCmd.lower()
 						if cmd in COMMANDS:
-							
 							if cmd == "mute":
 								addMutedUser(userId)
 								debug("added muted user")
@@ -160,6 +159,10 @@ while True:
 								debug("removed muted user")
 						else:
 							debug("command {} not valid".format(cmd))
+
+						# Cleanup
+						parseCommand = False
+						currentCmd = ""
 					else:
 						currentCmd = currentCmd + char
 				elif parseNumber:
