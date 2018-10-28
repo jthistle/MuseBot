@@ -3,8 +3,8 @@ A bot for the MuseScore Developers Telegram chat: https://t.me/musescoreeditorch
 
 ## Features
 Responds to any message with a number in the format `#xxxxxx`.
-If it is low enough, the relevant pull request will be linked, if it is higher
-then the relevant musescore.org node will be linked.
+If an issue is found with that number, it will be linked, if not then the relevant PR, if any, will be linked.
+Force the bot to link a PR by referencing a PR number as `pr#xxxx`.
 
 ### Commands
 
