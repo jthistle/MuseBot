@@ -8,18 +8,25 @@ import time
 import datetime
 import shelve
 
+try:
+	import production
+except ImportError:
+	# We aren't running on a production server, so
+	# use default values.
+	DEBUG = True
+	DEBUG_TO_FILE = False
+	DEBUG_FILE = "log.txt"
+	DATA_FILE = "data.dat"
+
 URL = "api.telegram.org"
 REQUEST_URL = "/bot"+APIKEY+"/"
 REQUEST_DELAY = 1	# second to wait between requests
 HEADERS = {'Content-type': 'application/json'}
 HTTP_ERRORS_FATAL = True
-DEBUG = True
-DEBUG_TO_FILE = False
-DEBUG_FILE = "log.txt"
+
 DEBUG_LEVELS = ["debug", "notice", "warning", "error"]
 
 COMMANDS = ["mute", "unmute"]
-DATA_FILE = "data.dat"
 
 MUSESCORE_NODE_URL = "https://musescore.org/node/"
 GITHUB_PULL_URL = "https://github.com/musescore/MuseScore/pull/"
