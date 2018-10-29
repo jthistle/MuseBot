@@ -13,3 +13,5 @@ that invokes it.
 
 **unmute** - this command will allow the bot to respond to messages from the user
 that invokes it, if it had been previously muted.
+
+**delete** - if the last message was from the bot, it will be deleted
