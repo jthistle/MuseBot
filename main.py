@@ -7,6 +7,7 @@ import json
 import time
 import datetime
 import shelve
+import traceback
 
 try:
 	from production import *
@@ -106,106 +107,122 @@ def removeMutedUser(userId):
 			mutedUsers.remove(userId)
 		f["mutedUsers"] = mutedUsers
 
-debug("Starting MuseBot...")
-if DEBUG:
-	debug(makeApiRequest("getMe"))
+def main():
+	debug("Starting MuseBot...")
+	if DEBUG:
+		debug(makeApiRequest("getMe"))
 
-startingUpdates = [1]
-startingUpdates = makeApiRequest("getUpdates", {"timeout": 0, "offset": -1})
+	startingUpdates = [1]
+	startingUpdates = makeApiRequest("getUpdates", {"timeout": 0, "offset": -1})
 
-lastOffset = 0
-if len(startingUpdates) > 0:
-	lastOffset = startingUpdates[-1]["update_id"] + 1
+	lastOffset = 0
+	if len(startingUpdates) > 0:
+		lastOffset = startingUpdates[-1]["update_id"] + 1
 
-while True:
-	updates = makeApiRequest("getUpdates", {"timeout": REQUEST_DELAY, "offset": lastOffset})
-	for update in updates:
-		lastOffset = update["update_id"] + 1
-		if "message" in update.keys():
-			if "text" not in update["message"].keys():
-				continue
-			text = update["message"]["text"] + " "	# add whitespace to force finishing parsing numbers
-			channel = update["message"]["chat"]["id"]
-			debug("New update: message in {}: {}".format(channel, text))
 
-			if "from" not in update["message"]:
-				debug("no sending user for message")
-				userId = ""
-			else:
-				userId = update["message"]["from"]["id"]
+	while True:
+		updates = makeApiRequest("getUpdates", {"timeout": REQUEST_DELAY, "offset": lastOffset})
+		for update in updates:
+			lastOffset = update["update_id"] + 1
+			if "message" in update.keys():
+				if "text" not in update["message"].keys():
+					continue
+				text = update["message"]["text"] + " "	# add whitespace to force finishing parsing numbers
+				channel = update["message"]["chat"]["id"]
+				debug("New update: message in {}: {}".format(channel, text))
 
-			isMuted = False
-			mutedUsers = getMutedUsers()
-			if userId in mutedUsers:
-				debug("user is muted, skipping")
-				isMuted = True
+				if "from" not in update["message"]:
+					debug("no sending user for message")
+					userId = ""
+				else:
+					userId = update["message"]["from"]["id"]
 
-			parseNumber = False
-			parseCommand = False
-			forcePr = False
-			currentCmd = ""
-			currentNum = ""
-			for i in range(len(text)):
-				char = text[i]
-				if char == "#":
-					if not isMuted:
-						parseNumber = True
-						if i-2 >= 0:
-							if text[i-2:i].lower() == "pr":
-								forcePr = True
-				elif char == "/":
-					if i == 0:
-						parseCommand = True
-				elif parseCommand:
-					if char in (" ", "@"):
-						# Handle command
-						cmd = currentCmd.lower()
-						if cmd in COMMANDS:
-							if cmd == "mute":
-								addMutedUser(userId)
-								debug("added muted user")
-							elif cmd == "unmute":
-								removeMutedUser(userId)
-								debug("removed muted user")
+				isMuted = False
+				mutedUsers = getMutedUsers()
+				if userId in mutedUsers:
+					debug("user is muted, skipping")
+					isMuted = True
+
+				parseNumber = False
+				parseCommand = False
+				forcePr = False
+				currentCmd = ""
+				currentNum = ""
+				for i in range(len(text)):
+					char = text[i]
+					if char == "#":
+						if not isMuted:
+							parseNumber = True
+
+							# allow whitespace between pr and #
+							checkEndChar = i-1
+							for j in range(i-1, -1, -1):
+								if text[j] == " ":
+									checkEndChar -= 1
+								else:
+									break
+
+							if checkEndChar-1 >= 0:
+								if text[checkEndChar-1:checkEndChar+1].lower() == "pr":
+									forcePr = True
+					elif char == "/":
+						if i == 0:
+							parseCommand = True
+					elif parseCommand:
+						if char in (" ", "@"):
+							# Handle command
+							cmd = currentCmd.lower()
+							if cmd in COMMANDS:
+								if cmd == "mute":
+									addMutedUser(userId)
+									debug("added muted user")
+								elif cmd == "unmute":
+									removeMutedUser(userId)
+									debug("removed muted user")
+							else:
+								debug("command {} not valid".format(cmd))
+
+							# Cleanup
+							parseCommand = False
+							currentCmd = ""
 						else:
-							debug("command {} not valid".format(cmd))
+							currentCmd = currentCmd + char
+					elif parseNumber:
+						if char.isdigit():
+							currentNum = currentNum+char
+						else:
+							if currentNum != "":
+								finalNum = int(currentNum)
+								debug("Looking for issue/node #{}".format(currentNum))
+								found = False
 
-						# Cleanup
-						parseCommand = False
-						currentCmd = ""
-					else:
-						currentCmd = currentCmd + char
-				elif parseNumber:
-					if char.isdigit():
-						currentNum = currentNum+char
-					else:
-						if currentNum != "":
-							finalNum = int(currentNum)
-							debug("Looking for issue/node #{}".format(currentNum))
-							found = False
+								# First, look for a MuseScore.org node
+								if not forcePr:
+									urlToCheck = MUSESCORE_NODE_URL+currentNum
+									if checkExists(urlToCheck):
+										msg = "Node #{}: {}".format(finalNum, urlToCheck)
+										sendMessage(msg, channel)
+										found = True
+									else:
+										debug("Couldn't find node #{}, will look for PR".format(finalNum))
+								
+								if not found:
+									# Look for a github issue
+									urlToCheck = GITHUB_PULL_URL+currentNum
+									if checkExists(urlToCheck):
+										msg = "PR #{}: {}".format(finalNum, urlToCheck)
+										sendMessage(msg, channel)
+									else:
+										debug("Couldn't find PR #{}".format(finalNum))
 
-							# First, look for a MuseScore.org node
-							if not forcePr:
-								urlToCheck = MUSESCORE_NODE_URL+currentNum
-								if checkExists(urlToCheck):
-									msg = "Node #{}: {}".format(finalNum, urlToCheck)
-									sendMessage(msg, channel)
-									found = True
-								else:
-									debug("Couldn't find node #{}, will look for PR".format(finalNum))
-							
-							if not found:
-								# Look for a github issue
-								urlToCheck = GITHUB_PULL_URL+currentNum
-								if checkExists(urlToCheck):
-									msg = "PR #{}: {}".format(finalNum, urlToCheck)
-									sendMessage(msg, channel)
-								else:
-									debug("Couldn't find PR #{}".format(finalNum))
+							# Cleanup
+							currentNum = ""
+							parseNumber = False
+							forcePr = False
 
-						# Cleanup
-						currentNum = ""
-						parseNumber = False
-						forcePr = False
+		time.sleep(REQUEST_DELAY)
 
-	time.sleep(REQUEST_DELAY)
+try:
+	main()
+except Exception as e:
+	debug(traceback.format_exc(), 3)
