@@ -119,11 +119,12 @@ def updateLog():
 		currentTime = time.time()
 		toRemove = []
 		for i in range(len(log)):
-			if currentTime - log[i]["date"] > 60*60*48:
+			if currentTime - log[i]["date"] > 60*60*24:
 				toRemove.append(i)
 
 		for i in range(len(toRemove)-1, -1, -1):
 			del log[i]
+		debug("removed {} old messages".format(len(toRemove)))
 
 		f["messageLog"] = log
 	debug("completed log update")
