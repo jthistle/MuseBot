@@ -6,9 +6,11 @@ import traceback
 
 try:
 	from production import *
+	ERRORS_FATAL = False
 except ImportError:
 	# We aren't running on a production server, so
 	# use default values.
+	ERRORS_FATAL = True
 	DEBUG = True
 	DEBUG_TO_FILE = False
 	DEBUG_FILE = "log.txt"
@@ -18,7 +20,7 @@ from config import *
 from functions import *
 
 def main():
-	debug("Starting MuseBot...")
+	debug("Starting MuseBot...", 1)
 	metaData = makeApiRequest("getMe")
 
 	startingUpdates = [1]
@@ -138,9 +140,29 @@ def main():
 							parseNumber = False
 							forcePr = False
 
+							print(dssdsds)
+
 		time.sleep(REQUEST_DELAY)
 
-try:
-	main()
-except Exception as e:
-	debug(traceback.format_exc(), 3)
+if __name__ == "__main__":
+	while True:
+		try:
+			main()
+		except ApiError as e:
+			debug(traceback.format_exc(), 3)
+			debug("=== {}".format(str(e)))
+			if int(str(e)) in HTTP_ERRORS_FATAL:
+				debug("error code {} is fatal".format(str(e)), 1)
+				break
+			else:
+				debug("error code {} is NOT fatal".format(str(e)), 1)
+		except Exception as e:
+			debug(traceback.format_exc(), 3)
+
+		if ERRORS_FATAL:
+			break
+		else:
+			debug("automatically restarting MuseBot")
+			reconnect()
+
+debug("finished execution successfully", 1)

@@ -21,7 +21,13 @@ except ImportError:
 
 from config import *
 
+class ApiError(Exception):
+    pass
+
 con = http.client.HTTPSConnection(URL, 443)	# gives HTTPS
+
+def reconnect():
+	con = http.client.HTTPSConnection(URL, 443)	# gives HTTPS
 
 def makeApiRequest(cmd, data={}):
 	jsonData = json.dumps(data)
@@ -30,12 +36,9 @@ def makeApiRequest(cmd, data={}):
 	response = con.getresponse()
 	decodedResponse = json.loads(response.read().decode())
 	if not decodedResponse["ok"]:
-		if HTTP_ERRORS_FATAL:
-			debug("reponse: {}".format(decodedResponse), 3)
-			raise Exception("Error: reponse: {}".format(decodedResponse))
-		else:
-			debug("reponse: {}".format(response), 3)
-			return False
+		debug("reponse: {}".format(decodedResponse), 3)
+		raise ApiError(decodedResponse["error_code"])
+		return False
 
 	return decodedResponse["result"]
 
