@@ -108,23 +108,25 @@ def logMessage(msg):
 		debug("logging message")
 		log.append(msg)
 		f["messageLog"] = log
-	updateLog()
 
 def updateLog():
+	debug("updating log")
 	with shelve.open(DATA_FILE) as f:
 		log = []
 		if "messageLog" in f.keys():
 			log = f["messageLog"]
 		
+		currentTime = time.time()
 		toRemove = []
 		for i in range(len(log)):
-			if time.time() - log[i]["date"] > 60*60*48:
+			if currentTime - log[i]["date"] > 60*60*48:
 				toRemove.append(i)
 
 		for i in range(len(toRemove)-1, -1, -1):
 			del log[i]
 
 		f["messageLog"] = log
+	debug("completed log update")
 
 def getMessages(i, chatId, limit=1):
 	# Gets the message with index i in log, starting from the _lastest_ one
