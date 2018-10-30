@@ -6,7 +6,7 @@ URL = "api.telegram.org"
 REQUEST_URL = "/bot"+APIKEY+"/"
 REQUEST_DELAY = 1	# second to wait between requests
 HEADERS = {'Content-type': 'application/json'}
-HTTP_ERRORS_FATAL = (502, 409)
+HTTP_ERRORS_FATAL = (502, 409, 404)
 
 DEBUG_LEVELS = ["debug", "notice", "warning", "error"]
 

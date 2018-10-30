@@ -93,7 +93,7 @@ def main():
 									removeMutedUser(userId)
 									debug("removed muted user")
 								elif cmd == "delete":
-									lastMsgs = getMessages(1, limit=1)
+									lastMsgs = getMessages(1, channel, limit=1)
 									if lastMsgs:
 										if int(lastMsgs[0]["message_id"]) < messageId - 1:
 											# Last message is from bot, delete
@@ -139,8 +139,6 @@ def main():
 							currentNum = ""
 							parseNumber = False
 							forcePr = False
-
-							print(dssdsds)
 
 		time.sleep(REQUEST_DELAY)
 

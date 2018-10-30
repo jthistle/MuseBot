@@ -126,7 +126,7 @@ def updateLog():
 
 		f["messageLog"] = log
 
-def getMessages(i, limit=1):
+def getMessages(i, chatId, limit=1):
 	# Gets the message with index i in log, starting from the _lastest_ one
 	with shelve.open(DATA_FILE) as f:
 		log = []
@@ -135,11 +135,13 @@ def getMessages(i, limit=1):
 		
 		toReturn = []
 		for j in range(limit):
-			if len(log)-i-1 >= 0:
-				toReturn.append(log[len(log)-i-1])
-			else:
-				break
-			i -= 1
+			while len(log)-i-1 >= 0:
+				thisMsg = log[len(log)-i-1]
+				if thisMsg["chat"]["id"] == chatId:
+					toReturn.append(log[len(log)-i-1])
+					i += 1
+					break
+				i += 1
 
 		if len(toReturn) > 0:
 			return toReturn
