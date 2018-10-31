@@ -149,16 +149,3 @@ def getMessages(i, chatId, limit=1):
 		if len(toReturn) > 0:
 			return toReturn
 	return False
-
-def addTask(task):
-	with shelve.open(DATA_FILE) as f:
-		if "tasks" in f.keys():
-			f["tasks"].append(task)
-		else:
-			f["tasks"] == [task]
-
-def taskInQueue(task):
-	with shelve.open(DATA_FILE) as f:
-		if "tasks" in f.keys():
-			return task in f["tasks"]
-	return False
