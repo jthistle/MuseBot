@@ -160,7 +160,9 @@ if __name__ == "__main__":
 		if ERRORS_FATAL:
 			break
 		else:
-			debug("automatically restarting MuseBot")
+			debug("waiting before restart")
+			time.sleep(RESTART_TIMEOUT)
+			debug("automatically restarting MuseBot", 1)
 			reconnect()
 
 debug("finished execution successfully", 1)

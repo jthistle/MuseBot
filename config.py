@@ -5,6 +5,7 @@ from secrets import *
 URL = "api.telegram.org"
 REQUEST_URL = "/bot"+APIKEY+"/"
 REQUEST_DELAY = 1	# second to wait between requests
+RESTART_TIMEOUT = 5
 HEADERS = {'Content-type': 'application/json'}
 HTTP_ERRORS_FATAL = (409, 404)
 
