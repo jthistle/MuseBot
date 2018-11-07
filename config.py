@@ -11,7 +11,10 @@ HTTP_ERRORS_FATAL = (409, 404)
 
 DEBUG_LEVELS = ["debug", "notice", "warning", "error"]
 
-COMMANDS = ["mute", "unmute", "delete"]
+COMMANDS = ["mute", "unmute", "delete", "integrate"]
 
 MUSESCORE_NODE_URL = "https://musescore.org/node/"
 GITHUB_PULL_URL = "https://github.com/musescore/MuseScore/pull/"
+
+WEBHOOKS = ["push", "pull_request"]
+WEBHOOKS_DIR = "/var/www/html/queue/"

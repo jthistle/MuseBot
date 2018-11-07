@@ -4,6 +4,10 @@
 	error_reporting(E_ALL);
 
 	define("TOKEN", "temptoken");
+	define("BASE_DIR", "/var/www/html/queue/");
+
+	if (!file_exists(BASE_DIR))
+		mkdir(BASE_DIR, 0744);
 
 	if (!isset($_GET["token"])) {
 		http_response_code(501);
@@ -18,16 +22,12 @@
 
 	$headers = getallheaders();
 	$eventType = $headers["X-GitHub-Event"];
-	$payload = json_decode(file_get_contents('php://input'));
+	$payload = file_get_contents('php://input');
 
 	echo "Got event: ".$eventType."\n";
+	file_put_contents(BASE_DIR."$eventType.txt", $payload);
+	echo "Wrote event file: $payload\n";
 
-	$command = escapeshellcmd("/home/pi/MuseBot/runWebhook.py eventPush");	// THIS ISN't OWKRING
-	echo "Executing: $command\n";
-	$output = shell_exec($command);
-	echo "Output: $output\n";
-
-	
 	exit;
 
 ?>

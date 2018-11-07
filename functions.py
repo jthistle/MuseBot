@@ -8,6 +8,7 @@ import time
 import datetime
 import shelve
 import traceback
+import os
 
 try:
 	from production import *
@@ -149,3 +150,42 @@ def getMessages(i, chatId, limit=1):
 		if len(toReturn) > 0:
 			return toReturn
 	return False
+
+def getWebhooks():
+	for w in WEBHOOKS:
+		webhookPath = WEBHOOKS_DIR+w+".txt"
+		if os.path.exists(webhookPath):
+			debug("Found webhook event {}".format(w))
+			with open(webhookPath, "r") as f:
+				payload = json.loads(f.read())
+				if w == "pull_request":
+					prDetails = payload["pull_request"]
+					for ig in getIntegrations():
+						number = prDetails["number"]
+						url = prDetails["html_url"]
+						username = prDetails["user"]["login"]
+						msg = "New Pull Request: [#{}]({}) by {}".format(number, url, username)
+
+						sendMessage(msg, ig)
+				else:
+					debug("Unrecognized webhook {}".format(w), 1)
+			debug("Removing {}".format(webhookPath))
+			os.remove(webhookPath)
+
+def integrate(id):
+	with shelve.open(DATA_FILE) as f:
+		integrations = []
+		if "integrations" in f.keys():
+			integrations = f["integrations"]
+
+		integrations.append(id)
+
+		f["integrations"] = integrations
+
+def getIntegrations():
+	with shelve.open(DATA_FILE) as f:
+		integrations = []
+		if "integrations" in f.keys():
+			integrations = f["integrations"]
+
+		return integrations
