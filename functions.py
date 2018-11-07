@@ -160,13 +160,15 @@ def getWebhooks():
 				payload = json.loads(f.read())
 				if w == "pull_request":
 					prDetails = payload["pull_request"]
-					for ig in getIntegrations():
-						number = prDetails["number"]
-						url = prDetails["html_url"]
-						username = prDetails["user"]["login"]
-						msg = "New Pull Request: [#{}]({}) by {}".format(number, url, username)
+					if payload["action"] == "opened":
+						for ig in getIntegrations():
+							number = prDetails["number"]
+							url = prDetails["html_url"]
+							username = prDetails["user"]["login"]
+							title = prDetails["title"]
+							msg = "New Pull Request: [#{} - {}]({}) by {}".format(number, title, url, username)
 
-						sendMessage(msg, ig)
+							sendMessage(msg, ig)
 				else:
 					debug("Unrecognized webhook {}".format(w), 1)
 			debug("Removing {}".format(webhookPath))
