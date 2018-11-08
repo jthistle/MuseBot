@@ -197,8 +197,8 @@ def integrate(channel):
 		if "integrations" in f.keys():
 			integrations = f["integrations"]
 
-		integrations.append(channel)
-
+		if channel not in integrations:
+			integrations.append(channel)
 		f["integrations"] = integrations
 
 def unintegrate(channel):
