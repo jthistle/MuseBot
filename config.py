@@ -11,7 +11,7 @@ HTTP_ERRORS_FATAL = (409, 404)
 
 DEBUG_LEVELS = ["debug", "notice", "warning", "error"]
 
-COMMANDS = ["mute", "unmute", "delete", "integrate"]
+COMMANDS = ["mute", "unmute", "delete", "integrate", "unintegrate"]
 
 MUSESCORE_NODE_URL = "https://musescore.org/node/"
 GITHUB_PULL_URL = "https://github.com/musescore/MuseScore/pull/"

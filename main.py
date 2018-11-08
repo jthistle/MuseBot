@@ -102,6 +102,8 @@ def main():
 								elif cmd == "integrate":
 									integrate(channel)
 									sendMessage("Integrated MuseBot!", channel)
+								elif cmd == "unintegrate":
+									unintegrate(channel)
 							else:
 								debug("command {} not valid".format(cmd))
 

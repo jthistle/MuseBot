@@ -191,13 +191,24 @@ def getWebhooks():
 			debug("Removing {}".format(webhookPath))
 			os.remove(webhookPath)
 
-def integrate(id):
+def integrate(channel):
 	with shelve.open(DATA_FILE) as f:
 		integrations = []
 		if "integrations" in f.keys():
 			integrations = f["integrations"]
 
-		integrations.append(id)
+		integrations.append(channel)
+
+		f["integrations"] = integrations
+
+def unintegrate(channel):
+	with shelve.open(DATA_FILE) as f:
+		integrations = []
+		if "integrations" in f.keys():
+			integrations = f["integrations"]
+
+		if channel in integrations:
+			integrations.remove(channel)
 
 		f["integrations"] = integrations
 
