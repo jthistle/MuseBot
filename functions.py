@@ -8,6 +8,7 @@ import time
 import datetime
 import shelve
 import traceback
+import os
 
 try:
 	from production import *
@@ -50,9 +51,13 @@ def checkExists(url):
 
 	return True
 
-def sendMessage(text, channel):
+def sendMessage(text, channel, previewLinks = True):
 	debug("Sending to {}: {}".format(channel, text))
-	return makeApiRequest("sendMessage", {"chat_id": channel, "text": text, "parse_mode": "Markdown"})
+	return makeApiRequest("sendMessage", {"chat_id": channel, "text": text, "parse_mode": "Markdown", "disable_web_page_preview": not previewLinks})
+
+def sendToIntegrations(text, previewLinks = True):
+	for ig in getIntegrations():
+		sendMessage(text, ig, previewLinks)
 
 def debug(text, level=0):
 	if level >= len(DEBUG_LEVELS):
@@ -149,3 +154,68 @@ def getMessages(i, chatId, limit=1):
 		if len(toReturn) > 0:
 			return toReturn
 	return False
+
+def getWebhooks():
+	for w in WEBHOOKS:
+		webhookPath = WEBHOOKS_DIR+w+".txt"
+		if os.path.exists(webhookPath):
+			debug("Found webhook event {}".format(w))
+			with open(webhookPath, "r") as f:
+				payload = json.loads(f.read())
+				if w == "pull_request":
+					prDetails = payload["pull_request"]
+					if payload["action"] == "opened":
+						number = prDetails["number"]
+						url = prDetails["html_url"]
+						username = prDetails["user"]["login"]
+						title = prDetails["title"]
+						msg = "New Pull Request: [#{} - {}]({}) by {}".format(number, title, url, username)
+
+						sendToIntegrations(msg, False)
+				elif w == "push":
+					commits = payload["commits"]
+					pusher = payload["pusher"]["name"]
+					branch = payload["ref"][11:]	# eg refs/heads/master
+					latestCommit = commits[-1]
+					latestMessage = latestCommit["message"]
+					if len(latestMessage) > 70:
+						latestMessage = latestMessage[:70]+"..."
+					latestCommitLink = "[{}]({}) - _{}_".format(latestCommit["id"][:6], latestCommit["url"], latestMessage)
+					msg = "{} pushed {} commit{} to {}, including {}".format(
+						pusher, len(commits), "s" if len(commits) > 1 else "", branch, latestCommitLink
+						)
+
+					sendToIntegrations(msg, False)
+				else:
+					debug("Unhandled webhook {}".format(w), 1)
+			debug("Removing {}".format(webhookPath))
+			os.remove(webhookPath)
+
+def integrate(channel):
+	with shelve.open(DATA_FILE) as f:
+		integrations = []
+		if "integrations" in f.keys():
+			integrations = f["integrations"]
+
+		integrations.append(channel)
+
+		f["integrations"] = integrations
+
+def unintegrate(channel):
+	with shelve.open(DATA_FILE) as f:
+		integrations = []
+		if "integrations" in f.keys():
+			integrations = f["integrations"]
+
+		if channel in integrations:
+			integrations.remove(channel)
+
+		f["integrations"] = integrations
+
+def getIntegrations():
+	with shelve.open(DATA_FILE) as f:
+		integrations = []
+		if "integrations" in f.keys():
+			integrations = f["integrations"]
+
+		return integrations

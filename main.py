@@ -99,6 +99,11 @@ def main():
 											# Last message is from bot, delete
 											debug("deleting message at {}".format(messageId-1))
 											makeApiRequest("deleteMessage", {"chat_id": channel, "message_id": messageId-1})
+								elif cmd == "integrate":
+									integrate(channel)
+									sendMessage("Integrated MuseBot!", channel)
+								elif cmd == "unintegrate":
+									unintegrate(channel)
 							else:
 								debug("command {} not valid".format(cmd))
 
@@ -139,6 +144,9 @@ def main():
 							currentNum = ""
 							parseNumber = False
 							forcePr = False
+
+		# Handle webhooks
+		getWebhooks()
 
 		time.sleep(REQUEST_DELAY)
 
