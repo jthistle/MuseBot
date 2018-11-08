@@ -3,3 +3,4 @@ secrets.py
 log.txt
 data.*
 production.py
+updatePi.sh

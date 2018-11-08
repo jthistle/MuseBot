@@ -51,9 +51,13 @@ def checkExists(url):
 
 	return True
 
-def sendMessage(text, channel):
+def sendMessage(text, channel, previewLinks = True):
 	debug("Sending to {}: {}".format(channel, text))
-	return makeApiRequest("sendMessage", {"chat_id": channel, "text": text, "parse_mode": "Markdown"})
+	return makeApiRequest("sendMessage", {"chat_id": channel, "text": text, "parse_mode": "Markdown", "disable_web_page_preview": not previewLinks})
+
+def sendToIntegrations(text, previewLinks = True):
+	for ig in getIntegrations():
+		sendMessage(text, ig, previewLinks)
 
 def debug(text, level=0):
 	if level >= len(DEBUG_LEVELS):
@@ -161,16 +165,29 @@ def getWebhooks():
 				if w == "pull_request":
 					prDetails = payload["pull_request"]
 					if payload["action"] == "opened":
-						for ig in getIntegrations():
-							number = prDetails["number"]
-							url = prDetails["html_url"]
-							username = prDetails["user"]["login"]
-							title = prDetails["title"]
-							msg = "New Pull Request: [#{} - {}]({}) by {}".format(number, title, url, username)
+						number = prDetails["number"]
+						url = prDetails["html_url"]
+						username = prDetails["user"]["login"]
+						title = prDetails["title"]
+						msg = "New Pull Request: [#{} - {}]({}) by {}".format(number, title, url, username)
 
-							sendMessage(msg, ig)
+						sendToIntegrations(msg, False)
+				elif w == "push":
+					commits = payload["commits"]
+					pusher = payload["pusher"]["name"]
+					branch = payload["ref"][11:]	# eg refs/heads/master
+					latestCommit = commits[-1]
+					latestMessage = latestCommit["message"]
+					if len(latestMessage) > 70:
+						latestMessage = latestMessage[:70]+"..."
+					latestCommitLink = "[{}]({}) - _{}_".format(latestCommit["id"][:6], latestCommit["url"], latestMessage)
+					msg = "{} pushed {} commit{} to {}, including {}".format(
+						pusher, len(commits), "s" if len(commits) > 1 else "", branch, latestCommitLink
+						)
+
+					sendToIntegrations(msg, False)
 				else:
-					debug("Unrecognized webhook {}".format(w), 1)
+					debug("Unhandled webhook {}".format(w), 1)
 			debug("Removing {}".format(webhookPath))
 			os.remove(webhookPath)
 
