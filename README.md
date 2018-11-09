@@ -15,3 +15,7 @@ that invokes it.
 that invokes it, if it had been previously muted.
 
 **delete** - if the last message was from the bot, it will be deleted
+
+**integrate** - integrate PR and push notification messages into a chat
+
+**unintegrate** - remove an integration in this chat
