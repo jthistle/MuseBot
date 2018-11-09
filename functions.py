@@ -176,7 +176,7 @@ def getWebhooks():
 					commits = payload["commits"]
 					pusher = payload["pusher"]["name"]
 					branch = payload["ref"][11:]	# eg refs/heads/master
-					latestCommit = commits[-1]
+					latestCommit = commits[0]
 					latestMessage = latestCommit["message"]
 					if len(latestMessage) > 70:
 						latestMessage = latestMessage[:70]+"..."
