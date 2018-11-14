@@ -11,10 +11,12 @@ HTTP_ERRORS_FATAL = (409, 404)
 
 DEBUG_LEVELS = ["debug", "notice", "warning", "error"]
 
-COMMANDS = ["mute", "unmute", "delete", "integrate", "unintegrate"]
+COMMANDS = ["mute", "unmute", "delete", "integrate", "unintegrate", "help"]
 
 MUSESCORE_NODE_URL = "https://musescore.org/node/"
 GITHUB_PULL_URL = "https://github.com/musescore/MuseScore/pull/"
 
 WEBHOOKS = ["push", "pull_request"]
 WEBHOOKS_DIR = "/var/www/html/queue/"
+
+HELP_TEXT = "To use this bot, mention issues/nodes from musescore.org as #xxxxxx, and mention PRs as pr #xxxx. They will then be automatically linked."
