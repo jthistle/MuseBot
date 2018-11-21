@@ -53,7 +53,7 @@ def checkExists(url):
 
 def sendMessage(text, channel, previewLinks = True):
 	debug("Sending to {}: {}".format(channel, text))
-	return makeApiRequest("sendMessage", {"chat_id": channel, "text": text, "parse_mode": "Markdown", "disable_web_page_preview": not previewLinks})
+	return makeApiRequest("sendMessage", {"chat_id": channel, "text": text, "parse_mode": "HTML", "disable_web_page_preview": not previewLinks})
 
 def sendToIntegrations(text, previewLinks = True):
 	for ig in getIntegrations():
@@ -169,7 +169,7 @@ def getWebhooks():
 						url = prDetails["html_url"]
 						username = prDetails["user"]["login"]
 						title = prDetails["title"]
-						msg = "New Pull Request: [#{} - {}]({}) by {}".format(number, escapeMarkdown(title), url, username)
+						msg = "New Pull Request: <a href=\"{}\">#{} - {}</a> by {}".format(url, number, title, username)
 
 						sendToIntegrations(msg, False)
 				elif w == "push":
@@ -180,7 +180,7 @@ def getWebhooks():
 					latestMessage = latestCommit["message"]
 					if len(latestMessage) > 70:
 						latestMessage = latestMessage[:70]+"..."
-					latestCommitLink = "[{}]({}) - _{}_".format(latestCommit["id"][:6], latestCommit["url"], escapeMarkdown(latestMessage))
+					latestCommitLink = "<a href=\"{}\">{}</a> - <i>{}</i>".format(latestCommit["url"], latestCommit["id"][:6], latestMessage)
 					msg = "{} pushed {} commit{} to {}, including {}".format(
 						pusher, len(commits), "s" if len(commits) > 1 else "", branch, latestCommitLink
 						)
@@ -219,8 +219,3 @@ def getIntegrations():
 			integrations = f["integrations"]
 
 		return integrations
-
-def escapeMarkdown(s):
-	for char in MARKDOWN_ESCAPE:
-		s = s.replace(char, '\\{}'.format(char))
-	return s

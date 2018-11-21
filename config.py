@@ -20,5 +20,3 @@ WEBHOOKS = ["push", "pull_request"]
 WEBHOOKS_DIR = "/var/www/html/queue/"
 
 HELP_TEXT = "To use this bot, mention issues/nodes from musescore.org as #xxxxxx, and mention PRs as pr #xxxx. They will then be automatically linked."
-
-MARKDOWN_ESCAPE = ["_", "*", "`", "[", "]"]
