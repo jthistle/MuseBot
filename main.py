@@ -127,7 +127,7 @@ def main():
 								if not forcePr:
 									urlToCheck = MUSESCORE_NODE_URL+currentNum
 									if checkExists(urlToCheck):
-										msg = "[Node #{}]({})".format(finalNum, urlToCheck)
+										msg = "<a href='{}'>Node #{}</a>".format(urlToCheck, finalNum)
 										sendMessage(msg, channel)
 										found = True
 									else:
@@ -137,7 +137,7 @@ def main():
 									# Look for a github issue
 									urlToCheck = GITHUB_PULL_URL+currentNum
 									if checkExists(urlToCheck):
-										msg = "[PR #{}]({})".format(finalNum, urlToCheck)
+										msg = "<a href='{}'>PR #{}</a>".format(urlToCheck, finalNum)
 										sendMessage(msg, channel)
 									else:
 										debug("Couldn't find PR #{}".format(finalNum))
