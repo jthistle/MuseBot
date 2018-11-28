@@ -82,7 +82,7 @@ def debug(text, level=0):
 
 	if level == len(DEBUG_LEVELS)-1:
 		logError(text)
-		checkErrorRates()
+		checkErrorRate()
 
 def logError(text):
 	debug("Logging error")
