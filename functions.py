@@ -9,6 +9,8 @@ import datetime
 import shelve
 import traceback
 import os
+import smtplib
+from email.mime.text import MIMEText
 
 try:
 	from production import *
@@ -19,6 +21,7 @@ except ImportError:
 	DEBUG_TO_FILE = False
 	DEBUG_FILE = "log.txt"
 	DATA_FILE = "data.dat"
+	ERROR_EMAIL = ""
 
 from config import *
 
@@ -77,6 +80,65 @@ def debug(text, level=0):
 	else:
 		print(msg)
 
+	if level == len(DEBUG_LEVELS)-1:
+		logError(text)
+		checkErrorRates()
+
+def logError(text):
+	debug("Logging error")
+	with shelve.open(DATA_FILE) as f:
+		errorLog = []
+		if "errors" in f.keys():
+			errorLog = f["errors"]
+
+		timestamp = int(time.time())
+
+		errorLog.append({"timestamp": timestamp, "error": text})
+		f["errors"] = errorLog
+
+	checkErrorRate()
+
+def checkErrorRate():
+	with shelve.open(DATA_FILE) as f:
+		lastEmail = 0
+		if "lastEmail" in f.keys():
+			lastEmail = f["lastEmail"]
+
+		errorLog = []
+		if "errors" in f.keys():
+			errorLog = f["errors"]
+
+		errorCount = len(errorLog)
+		isAbnormal = errorCount > 24
+
+		if isAbnormal and time.time()-lastEmail > 60*60:	# TODO make config value
+			debug("Increased error rate encountered")
+			if ERROR_EMAIL != "":
+				debug("Sending email")
+				msg = """
+MuseBot has experienced an increased error rate in the last 24 hours.
+
+{} errors have been logged. Action must be taken to resolve this.
+
+This is an automated alert.
+""".format(errorCount)
+				sendEmail("Increased error rate for MuseBot", msg) 	# TODO send email
+		f["lastEmail"] = int(time.time())
+
+def sendEmail(subject, msg):
+	if ERROR_EMAIL == "":
+		return True
+
+	toSend = MIMEText(msg)
+	toSend["Subject"] = subject
+	toSend["From"] = "admin@jamesthistlewood.co.uk"	# TODO make config/production option
+	toSend["To"] = ERROR_EMAIL
+
+	s = smtplib.SMTP("localhost")
+	s.send_message(toSend)
+	s.quit()
+	debug("Sent email")
+
 def getMutedUsers():
 	with shelve.open(DATA_FILE) as f:
 		if "mutedUsers" in f.keys():
@@ -88,7 +150,7 @@ def addMutedUser(userId):
 		mutedUsers = []
 		if "mutedUsers" in f.keys():
 			mutedUsers = f["mutedUsers"]
-		
+
 		if userId not in mutedUsers:
 			mutedUsers.append(userId)
 		f["mutedUsers"] = mutedUsers
@@ -98,7 +160,7 @@ def removeMutedUser(userId):
 		mutedUsers = []
 		if "mutedUsers" in f.keys():
 			mutedUsers = f["mutedUsers"]
-		
+
 		debug("muted users: {}".format(str(mutedUsers)))
 		if userId in mutedUsers:
 			mutedUsers.remove(userId)
@@ -109,7 +171,7 @@ def logMessage(msg):
 		log = []
 		if "messageLog" in f.keys():
 			log = f["messageLog"]
-		
+
 		debug("logging message")
 		log.append(msg)
 		f["messageLog"] = log
@@ -120,16 +182,26 @@ def updateLog():
 		log = []
 		if "messageLog" in f.keys():
 			log = f["messageLog"]
-		
+
+		errorLog = []
+		if "errorLog" in f.keys():
+			errorLog = f["errorLog"]
+
 		currentTime = time.time()
 		toRemove = []
-		for i in range(len(log)):
-			if currentTime - log[i]["date"] > 60*60*24:
+		for i in range(len(errorLog)):
+			if currentTime - errorLog[i]["timestamp"] >= 60*60*24:
 				toRemove.append(i)
 
 		for i in range(len(toRemove)-1, -1, -1):
-			del log[i]
-		debug("removed {} old messages".format(len(toRemove)))
+			del errorLog[i]
+
+		debug("removed {} old errors".format(len(toRemove)))
+
+		removeCount = len(log)-100 if len(log)-100 > 0 else 0
+		del log[100:]
+
+		debug("removed {} old messages".format(removeCount))
 
 		f["messageLog"] = log
 	debug("completed log update")

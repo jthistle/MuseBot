@@ -132,7 +132,7 @@ def main():
 										found = True
 									else:
 										debug("Couldn't find node #{}, will look for PR".format(finalNum))
-								
+
 								if not found:
 									# Look for a github issue
 									urlToCheck = GITHUB_PULL_URL+currentNum
