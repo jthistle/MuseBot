@@ -98,17 +98,22 @@ def logError(text):
 
 	checkErrorRate()
 
+def getErrorCount():
+	with shelve.open(DATA_FILE) as f:
+		errorLog = []
+		if "errors" in f.keys():
+			errorLog = f["errors"]
+
+		errorCount = len(errorLog)
+	return errorCount
+
 def checkErrorRate():
 	with shelve.open(DATA_FILE) as f:
 		lastEmail = 0
 		if "lastEmail" in f.keys():
 			lastEmail = f["lastEmail"]
 
-		errorLog = []
-		if "errors" in f.keys():
-			errorLog = f["errors"]
-
-		errorCount = len(errorLog)
+		errorCount = getErrorCount()
 		isAbnormal = errorCount > 24
 
 		if isAbnormal and time.time()-lastEmail > 60*60:	# TODO make config value
