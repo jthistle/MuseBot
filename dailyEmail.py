@@ -7,8 +7,9 @@ import traceback
 from functions import *
 
 try:
-	errors = getErrorCount()
-	msg = """In the last 24 hours MuseBot errored {} times""".format(errors)
-	sendEmail("Daily update", msg)
+	pass
+	#errors = getErrorCount()
+	#msg = """In the last 24 hours MuseBot errored {} times""".format(errors)
+	#sendEmail("Daily update", msg)
 except Exception as e:
 	debug(traceback.format_exc(), 3)

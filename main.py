@@ -10,14 +10,15 @@ try:
 except ImportError:
 	# We aren't running on a production server, so
 	# use default values.
-	ERRORS_FATAL = True
-	DEBUG = True
-	DEBUG_TO_FILE = False
-	DEBUG_FILE = "log.txt"
-	DATA_FILE = "data.dat"
+	from productionDefaults import *
+	print(DEBUG)
 
+print(DEBUG)
 from config import *
 from functions import *
+
+errorCountThisSession = 0
+lastEmail = 0
 
 def main():
 	debug("Starting MuseBot...", 1)
@@ -167,6 +168,17 @@ if __name__ == "__main__":
 		except Exception as e:
 			debug(traceback.format_exc(), 3)
 
+		errorCountThisSession += 1
+		debug("Errors this session: {}".format(errorCountThisSession), 1)
+
+		if errorCountThisSession >= ABNORMAL_ERRORS and time.time()-lastEmail >= 60*60:
+			msg = """MuseBot is experiencing elevated error rates. In the current session it has
+errored {} times. Action must be taken to resolve this.
+
+This is an automated message.""".format(errorCountThisSession)
+			sendMessage("MuseBot is experiencing elevated error rates", msg)
+			lastEmail = time.time()
+
 		if ERRORS_FATAL:
 			break
 		else:
@@ -175,4 +187,5 @@ if __name__ == "__main__":
 			debug("automatically restarting MuseBot", 1)
 			reconnect()
 
+sendEmail("MuseBot finished execution", "MuseBot finished execution. This is an automated message.")
 debug("finished execution successfully", 1)

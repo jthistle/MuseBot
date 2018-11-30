@@ -17,11 +17,7 @@ try:
 except ImportError:
 	# We aren't running on a production server, so
 	# use default values.
-	DEBUG = True
-	DEBUG_TO_FILE = False
-	DEBUG_FILE = "log.txt"
-	DATA_FILE = "data.dat"
-	ERROR_EMAIL = ""
+	from productionDefaults import *
 
 from config import *
 
@@ -79,56 +75,6 @@ def debug(text, level=0):
 		debugFile.close()
 	else:
 		print(msg)
-
-	if level == len(DEBUG_LEVELS)-1:
-		logError(text)
-		checkErrorRate()
-
-def logError(text):
-	debug("Logging error")
-	with shelve.open(DATA_FILE) as f:
-		errorLog = []
-		if "errors" in f.keys():
-			errorLog = f["errors"]
-
-		timestamp = int(time.time())
-
-		errorLog.append({"timestamp": timestamp, "error": text})
-		f["errors"] = errorLog
-
-	checkErrorRate()
-
-def getErrorCount():
-	with shelve.open(DATA_FILE) as f:
-		errorLog = []
-		if "errors" in f.keys():
-			errorLog = f["errors"]
-
-		errorCount = len(errorLog)
-	return errorCount
-
-def checkErrorRate():
-	with shelve.open(DATA_FILE) as f:
-		lastEmail = 0
-		if "lastEmail" in f.keys():
-			lastEmail = f["lastEmail"]
-
-		errorCount = getErrorCount()
-		isAbnormal = errorCount > 24
-
-		if isAbnormal and time.time()-lastEmail > 60*60:	# TODO make config value
-			debug("Increased error rate encountered")
-			if ERROR_EMAIL != "":
-				debug("Sending email")
-				msg = """
-MuseBot has experienced an increased error rate in the last 24 hours.
-
-{} errors have been logged. Action must be taken to resolve this.
-
-This is an automated alert.
-""".format(errorCount)
-				sendEmail("Increased error rate for MuseBot", msg) 	# TODO send email
-		f["lastEmail"] = int(time.time())
 
 def sendEmail(subject, msg):
 	if ERROR_EMAIL == "":
