@@ -51,6 +51,10 @@ def checkExists(url):
 	return True
 
 def sendMessage(text, channel, previewLinks = True):
+	# Remove any dodgy tags < >
+	text = text.replace("<", "&lt;")
+	text = text.replace(">", "&rt;")
+
 	debug("Sending to {}: {}".format(channel, text))
 	return makeApiRequest("sendMessage", {"chat_id": channel, "text": text, "parse_mode": "HTML", "disable_web_page_preview": not previewLinks})
 

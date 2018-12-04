@@ -17,7 +17,7 @@ print(DEBUG)
 from config import *
 from functions import *
 
-errorCountThisSession = 0
+errorLogThisSession = []
 lastEmail = 0
 
 def main():
@@ -168,14 +168,26 @@ if __name__ == "__main__":
 		except Exception as e:
 			debug(traceback.format_exc(), 3)
 
-		errorCountThisSession += 1
-		debug("Errors this session: {}".format(errorCountThisSession), 1)
+		currentTime = time.time()
+		errorLogThisSession.append(currentTime)
 
-		if errorCountThisSession >= ABNORMAL_ERRORS and time.time()-lastEmail >= 60*60:
-			msg = """MuseBot is experiencing elevated error rates. In the current session it has
+		# Remove errors older than 24 hours
+		toDelete = []
+		for i in range(len(errorLogThisSession)):
+			if currentTime-e >= 24*60*60:
+				toDelete.append(i)
+
+		for i in range(len(toDelete)-1, -1, -1):
+			del errorLogThisSession[i]
+
+		errorNumber = len(errorLogThisSession)
+		debug("Errors in last 24 hours: {}".format(errorNumber), 1)
+
+		if errorNumber >= ABNORMAL_ERRORS and time.time()-lastEmail >= 60*60:
+			msg = """MuseBot is experiencing elevated error rates. In the last 24 hours it has
 errored {} times. Action must be taken to resolve this.
 
-This is an automated message.""".format(errorCountThisSession)
+This is an automated message.""".format(errorNumber)
 			sendEmail("MuseBot is experiencing elevated error rates", msg)
 			lastEmail = time.time()
 
