@@ -50,11 +50,14 @@ def checkExists(url):
 
 	return True
 
-def sendMessage(text, channel, previewLinks = True):
+def sanitizeText(text):
 	# Remove any dodgy tags < >
 	text = text.replace("<", "&lt;")
-	text = text.replace(">", "&rt;")
+	text = text.replace(">", "&gt;")
 
+	return text
+
+def sendMessage(text, channel, previewLinks = True):
 	debug("Sending to {}: {}".format(channel, text))
 	return makeApiRequest("sendMessage", {"chat_id": channel, "text": text, "parse_mode": "HTML", "disable_web_page_preview": not previewLinks})
 
@@ -195,7 +198,7 @@ def getWebhooks():
 						number = prDetails["number"]
 						url = prDetails["html_url"]
 						username = prDetails["user"]["login"]
-						title = prDetails["title"]
+						title = sanitizeText(prDetails["title"])
 						msg = "New Pull Request: <a href=\"{}\">#{} - {}</a> by {}".format(url, number, title, username)
 
 						sendToIntegrations(msg, False)
@@ -204,7 +207,7 @@ def getWebhooks():
 					pusher = payload["pusher"]["name"]
 					branch = payload["ref"][11:]	# eg refs/heads/master
 					latestCommit = commits[0]
-					latestMessage = latestCommit["message"]
+					latestMessage = sanitizeText(latestCommit["message"])
 					if len(latestMessage) > 70:
 						latestMessage = latestMessage[:70]+"..."
 					latestCommitLink = "<a href=\"{}\">{}</a> - <i>{}</i>".format(latestCommit["url"], latestCommit["id"][:6], latestMessage)
