@@ -176,7 +176,7 @@ if __name__ == "__main__":
 errored {} times. Action must be taken to resolve this.
 
 This is an automated message.""".format(errorCountThisSession)
-			sendMessage("MuseBot is experiencing elevated error rates", msg)
+			sendEmail("MuseBot is experiencing elevated error rates", msg)
 			lastEmail = time.time()
 
 		if ERRORS_FATAL:
