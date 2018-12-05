@@ -174,7 +174,7 @@ if __name__ == "__main__":
 		# Remove errors older than 24 hours
 		toDelete = []
 		for i in range(len(errorLogThisSession)):
-			if currentTime-e >= 24*60*60:
+			if currentTime-errorLogThisSession[i] >= 24*60*60:
 				toDelete.append(i)
 
 		for i in range(len(toDelete)-1, -1, -1):
