@@ -190,6 +190,8 @@ errored {} times. Action must be taken to resolve this.
 This is an automated message.""".format(errorNumber)
 			sendEmail("MuseBot is experiencing elevated error rates", msg)
 			lastEmail = time.time()
+		else:
+			debug("Last email sent: {} seconds ago".format(time.time()-lastEmail))
 
 		if ERRORS_FATAL:
 			break
@@ -197,7 +199,7 @@ This is an automated message.""".format(errorNumber)
 			debug("waiting before restart")
 			time.sleep(RESTART_TIMEOUT)
 			debug("automatically restarting MuseBot", 1)
-			reconnect()
+			CON = reconnect()
 
 sendEmail("MuseBot finished execution", "MuseBot finished execution. This is an automated message.")
 debug("finished execution successfully", 1)

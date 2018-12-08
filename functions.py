@@ -24,16 +24,19 @@ from config import *
 class ApiError(Exception):
     pass
 
-con = http.client.HTTPSConnection(URL, 443)	# gives HTTPS
+CON = http.client.HTTPSConnection(URL, 443)	# gives HTTPS
 
 def reconnect():
-	con = http.client.HTTPSConnection(URL, 443)	# gives HTTPS
+	return http.client.HTTPSConnection(URL, 443)	# gives HTTPS
 
 def makeApiRequest(cmd, data={}):
 	jsonData = json.dumps(data)
-	con.request("POST", REQUEST_URL+cmd, jsonData, HEADERS)
+	try:
+		CON.request("POST", REQUEST_URL+cmd, jsonData, HEADERS)
+	except:
+		debug("An error occurred while carrying out the API request", 1)
 
-	response = con.getresponse()
+	response = CON.getresponse()
 	decodedResponse = json.loads(response.read().decode())
 	if not decodedResponse["ok"]:
 		debug("reponse: {}".format(decodedResponse), 3)
