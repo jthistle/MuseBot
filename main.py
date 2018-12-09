@@ -22,10 +22,10 @@ lastEmail = 0
 
 def main():
 	debug("Starting MuseBot...", 1)
-	metaData = makeApiRequest("getMe")
+	metaData = HANDLER.makeRequest("getMe")
 
 	startingUpdates = [1]
-	startingUpdates = makeApiRequest("getUpdates", {"timeout": 0, "offset": -1})
+	startingUpdates = HANDLER.makeRequest("getUpdates", {"timeout": 0, "offset": -1})
 
 	lastOffset = 0
 	if len(startingUpdates) > 0:
@@ -33,7 +33,7 @@ def main():
 
 
 	while True:
-		updates = makeApiRequest("getUpdates", {"timeout": REQUEST_DELAY, "offset": lastOffset})
+		updates = HANDLER.makeRequest("getUpdates", {"timeout": REQUEST_DELAY, "offset": lastOffset})
 		for update in updates:
 			lastOffset = update["update_id"] + 1
 			if "message" in update.keys():
@@ -99,7 +99,7 @@ def main():
 										if int(lastMsgs[0]["message_id"]) < messageId - 1:
 											# Last message is from bot, delete
 											debug("deleting message at {}".format(messageId-1))
-											makeApiRequest("deleteMessage", {"chat_id": channel, "message_id": messageId-1})
+											HANDLER.makeRequest("deleteMessage", {"chat_id": channel, "message_id": messageId-1})
 								elif cmd == "integrate":
 									integrate(channel)
 									sendMessage("Integrated MuseBot!", channel)
@@ -199,7 +199,7 @@ This is an automated message.""".format(errorNumber)
 			debug("waiting before restart")
 			time.sleep(RESTART_TIMEOUT)
 			debug("automatically restarting MuseBot", 1)
-			CON = reconnect()
+			HANDLER.reconnect()
 
 sendEmail("MuseBot finished execution", "MuseBot finished execution. This is an automated message.")
 debug("finished execution successfully", 1)

@@ -24,26 +24,30 @@ from config import *
 class ApiError(Exception):
     pass
 
-CON = http.client.HTTPSConnection(URL, 443)	# gives HTTPS
+class ApiHandler:
+	def __init__(self):
+		self.con = http.client.HTTPSConnection(URL, 443)
 
-def reconnect():
-	return http.client.HTTPSConnection(URL, 443)	# gives HTTPS
+	def reconnect(self):
+		self.con = http.client.HTTPSConnection(URL, 443)
 
-def makeApiRequest(cmd, data={}):
-	jsonData = json.dumps(data)
-	try:
-		CON.request("POST", REQUEST_URL+cmd, jsonData, HEADERS)
-	except:
-		debug("An error occurred while carrying out the API request", 1)
+	def makeRequest(self, cmd, data={}):
+		jsonData = json.dumps(data)
+		try:
+			self.con.request("POST", REQUEST_URL+cmd, jsonData, HEADERS)
+		except:
+			debug("An error occurred while carrying out the API request", 1)
 
-	response = CON.getresponse()
-	decodedResponse = json.loads(response.read().decode())
-	if not decodedResponse["ok"]:
-		debug("reponse: {}".format(decodedResponse), 3)
-		raise ApiError(decodedResponse["error_code"])
-		return False
+		response = self.con.getresponse()
+		decodedResponse = json.loads(response.read().decode())
+		if not decodedResponse["ok"]:
+			debug("reponse: {}".format(decodedResponse), 3)
+			raise ApiError(decodedResponse["error_code"])
+			return False
 
-	return decodedResponse["result"]
+		return decodedResponse["result"]
+
+HANDLER = ApiHandler()
 
 def checkExists(url):
 	try:
@@ -62,7 +66,7 @@ def sanitizeText(text):
 
 def sendMessage(text, channel, previewLinks = True):
 	debug("Sending to {}: {}".format(channel, text))
-	return makeApiRequest("sendMessage", {"chat_id": channel, "text": text, "parse_mode": "HTML", "disable_web_page_preview": not previewLinks})
+	return HANDLER.makeRequest("sendMessage", {"chat_id": channel, "text": text, "parse_mode": "HTML", "disable_web_page_preview": not previewLinks})
 
 def sendToIntegrations(text, previewLinks = True):
 	for ig in getIntegrations():
