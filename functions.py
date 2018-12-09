@@ -29,6 +29,7 @@ class ApiHandler:
 		self.con = http.client.HTTPSConnection(URL, 443)
 
 	def reconnect(self):
+		self.con.close()
 		self.con = http.client.HTTPSConnection(URL, 443)
 
 	def makeRequest(self, cmd, data={}):
