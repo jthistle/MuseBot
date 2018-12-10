@@ -149,21 +149,6 @@ def updateLog():
 		if "messageLog" in f.keys():
 			log = f["messageLog"]
 
-		errorLog = []
-		if "errorLog" in f.keys():
-			errorLog = f["errorLog"]
-
-		currentTime = time.time()
-		toRemove = []
-		for i in range(len(errorLog)):
-			if currentTime - errorLog[i]["timestamp"] >= 60*60*24:
-				toRemove.append(i)
-
-		for i in range(len(toRemove)-1, -1, -1):
-			del errorLog[i]
-
-		debug("removed {} old errors".format(len(toRemove)))
-
 		removeCount = len(log)-100 if len(log)-100 > 0 else 0
 		del log[100:]
 
