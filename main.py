@@ -195,11 +195,19 @@ This is an automated message.""".format(errorNumber)
 
 		if ERRORS_FATAL:
 			break
+		elif errorNumber >= FATAL_ERROR_COUNT:
+			debug("too many errors in the last 24 hours! Ending execution.", 2)
+			break
 		else:
 			debug("waiting before restart")
 			time.sleep(RESTART_TIMEOUT)
 			debug("automatically restarting MuseBot", 1)
-			HANDLER.reconnect()
+			try:
+				HANDLER.reconnect()
+			except Exception as e:
+				debug("Error reconnecting: ")
+				debug(traceback.format_exc(), 3)
+				break
 
 sendEmail("MuseBot finished execution", "MuseBot finished execution. This is an automated message.")
-debug("finished execution successfully", 1)
+debug("finished execution successfully(?)", 1)

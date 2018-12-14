@@ -22,3 +22,4 @@ WEBHOOKS_DIR = "/var/www/html/queue/"
 HELP_TEXT = "To use this bot, mention issues/nodes from musescore.org as #xxxxxx, and mention PRs as pr #xxxx. They will then be automatically linked."
 
 ABNORMAL_ERRORS = 24
+FATAL_ERROR_COUNT = 500	# After this many errors in 24 hours, stop trying to restart
