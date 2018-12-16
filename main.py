@@ -11,9 +11,7 @@ except ImportError:
 	# We aren't running on a production server, so
 	# use default values.
 	from productionDefaults import *
-	print(DEBUG)
 
-print(DEBUG)
 from config import *
 from functions import *
 

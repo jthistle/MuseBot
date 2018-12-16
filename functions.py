@@ -85,9 +85,13 @@ def debug(text, level=0):
 	timestamp = datetime.datetime.now().strftime("%y-%m-%d %H:%M:%S")
 	msg = timestamp + ": " + DEBUG_LEVELS[level] + ": " + str(text)
 	if DEBUG_TO_FILE:
-		debugFile = open(DEBUG_FILE, "a")
-		debugFile.write(msg+"\n")
-		debugFile.close()
+		try:
+			debugFile = open(DEBUG_FILE, "a")
+			debugFile.write(msg+"\n")
+			debugFile.close()
+		except Exception as e:
+			print("Error:",e)
+			# TODO send email
 	else:
 		print(msg)
 
