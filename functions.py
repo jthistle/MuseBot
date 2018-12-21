@@ -32,12 +32,13 @@ class ApiHandler:
 		self.con.close()
 		self.con = http.client.HTTPSConnection(URL, 443)
 
-	def makeRequest(self, cmd, data={}):
-		jsonData = json.dumps(data)
+	def makeRequest(self, cmd, data=None):
+		jsonData = json.dumps(data or {})
 		try:
 			self.con.request("POST", REQUEST_URL+cmd, jsonData, HEADERS)
 		except:
 			debug("An error occurred while carrying out the API request", 1)
+			raise
 
 		response = self.con.getresponse()
 		decodedResponse = json.loads(response.read().decode())

@@ -23,13 +23,13 @@
 	$result = curl_exec($ch);
 	
 	if (curl_error($ch)) {
-		echo "Error: ".curl_error($ch);
+		file_put_contents(BASE_DIR."error.txt", "Error: ".curl_error($ch));
 	}
 
 	curl_close($ch);
 
 	if (!$result) {
-		echo "Error: no result";
+		file_put_contents(BASE_DIR."error.txt", "Error: no result");
 		exit;
 	}
 
@@ -48,6 +48,8 @@
 
 	if ($verified)
 		file_put_contents(BASE_DIR."travis.txt", $decodedPayload);
+	else
+		file_put_contents(BASE_DIR."unverified.txt", $decodedPayload);
 
 	exit;
 
