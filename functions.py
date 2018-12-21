@@ -213,6 +213,27 @@ def getWebhooks():
 						)
 
 					sendToIntegrations(msg, False)
+				elif w == "travis":
+					isPr = payload["pull_request"]
+					if not isPr:
+						status = payload["status_message"].lower()
+						message = ""
+						if status == "fixed":
+							message = "has been fixed"
+						elif status == "broken":
+							message = "has been broken"
+						elif status == "still failing":
+							message = "is still failing"
+						elif status == "errored":
+							message = "has errored"
+
+						if message != "":
+							commit = payload["commit"];
+							commitURL = "<a href=\"https://github.com/musescore/MuseScore/commit/{}\">{}</a>".format(commit, commit[:6])
+							branch = payload["branch"]
+							user = payload["committer_name"]
+
+							msg = "MuseScore/{} : {} by {}: build {}".format(branch, commitURL, usr, message)
 				else:
 					debug("Unhandled webhook {}".format(w), 1)
 			debug("Removing {}".format(webhookPath))
