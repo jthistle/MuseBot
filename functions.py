@@ -234,6 +234,7 @@ def getWebhooks():
 							user = payload["committer_name"]
 
 							msg = "MuseScore/{} : {} by {}: build {}".format(branch, commitURL, usr, message)
+							sendToIntegrations(msg, True)
 				else:
 					debug("Unhandled webhook {}".format(w), 1)
 			debug("Removing {}".format(webhookPath))
