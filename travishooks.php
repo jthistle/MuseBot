@@ -16,7 +16,7 @@
 	}
 
 	// get public key
-	$ch = curl_init("https://api.travis-ci.com/config");
+	$ch = curl_init("https://api.travis-ci.org/config");
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($ch, CURLOPT_HEADER, 0);
 
