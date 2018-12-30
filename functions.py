@@ -91,8 +91,7 @@ def debug(text, level=0):
 			debugFile.write(msg+"\n")
 			debugFile.close()
 		except Exception as e:
-			print("Error:",e)
-			# TODO send email
+			print("Error debugging:", e)
 	else:
 		print(msg)
 
@@ -102,7 +101,7 @@ def sendEmail(subject, msg):
 
 	toSend = MIMEText(msg)
 	toSend["Subject"] = subject
-	toSend["From"] = "admin@jamesthistlewood.co.uk"	# TODO make config/production option
+	toSend["From"] = ERROR_EMAIL_SENDER
 	toSend["To"] = ERROR_EMAIL
 
 	s = smtplib.SMTP("localhost")
@@ -230,7 +229,7 @@ def getWebhooks():
 
 						if message != "":
 							commit = payload["commit"];
-							commitURL = "<a href=\"https://github.com/musescore/MuseScore/commit/{}\">{}</a>".format(commit, commit[:6])
+							commitURL = "<a href=\"{}{}\">{}</a>".format(GITHUB_COMMIT_URL, commit, commit[:6])
 							branch = payload["branch"]
 							user = payload["committer_name"]
 
