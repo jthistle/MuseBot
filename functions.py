@@ -227,7 +227,10 @@ def getWebhooks():
 						elif status == "errored":
 							message = "has errored"
 
-						if message != "":
+
+						repoOwner = payload["repository"]["owner_name"]
+
+						if message != "" and repoOwner.lower() == "musescore":
 							commit = payload["commit"];
 							commitURL = "<a href=\"{}{}\">{}</a>".format(GITHUB_COMMIT_URL, commit, commit[:6])
 							branch = payload["branch"]
