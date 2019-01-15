@@ -182,6 +182,65 @@ def getMessages(i, chatId, limit=1):
 			return toReturn
 	return False
 
+def hookPullRequest(payload):
+	prDetails = payload["pull_request"]
+	if payload["action"] == "opened":
+		number = prDetails["number"]
+		url = prDetails["html_url"]
+		username = prDetails["user"]["login"]
+		title = sanitizeText(prDetails["title"])
+		msg = "New Pull Request: <a href=\"{}\">#{} - {}</a> by {}".format(url, number, title, username)
+
+		sendToIntegrations(msg, False)
+
+def hookPush(payload):
+	commits = payload["commits"]
+	pusher = payload["pusher"]["name"]
+	branch = payload["ref"][11:]	# eg refs/heads/master
+
+	if len(commits) == 0:
+		return
+	latestCommit = commits[0]
+	latestMessage = sanitizeText(latestCommit["message"])
+	if len(latestMessage) > 70:
+		latestMessage = latestMessage[:70]+"..."
+	latestCommitLink = "<a href=\"{}\">{}</a> - <i>{}</i>".format(latestCommit["url"], latestCommit["id"][:6], latestMessage)
+	msg = "{} pushed {} commit{} to {}, including {}".format(
+		pusher, len(commits), "s" if len(commits) > 1 else "", branch, latestCommitLink
+		)
+
+	sendToIntegrations(msg, False)
+
+def hookTravis(payload):
+	debug("Travis hook")
+	isPr = payload["pull_request"]
+	if isPr:
+		return
+
+	status = payload["status_message"].lower()
+	debug("Status: "+status)
+	message = ""
+	if status == "fixed":
+		message = "has been fixed"
+	elif status == "broken":
+		message = "has been broken"
+	elif status == "still failing":
+		message = "is still failing"
+	elif status == "errored":
+		message = "has errored"
+
+	repoOwner = payload["repository"]["owner_name"]
+	debug("Repo owner: "+repoOwner)
+
+	if message != "" and repoOwner.lower() == "musescore":
+		commit = payload["commit"];
+		commitURL = "<a href=\"{}{}\">{}</a>".format(GITHUB_COMMIT_URL, commit, commit[:6])
+		branch = payload["branch"]
+		user = payload["committer_name"]
+
+		msg = "MuseScore/{} : {} by {}: build {}".format(branch, commitURL, user, message)
+		sendToIntegrations(msg, True)
+
 def getWebhooks():
 	for w in WEBHOOKS:
 		webhookPath = WEBHOOKS_DIR+w+".txt"
@@ -190,56 +249,14 @@ def getWebhooks():
 			with open(webhookPath, "r") as f:
 				payload = json.loads(f.read())
 				if w == "pull_request":
-					prDetails = payload["pull_request"]
-					if payload["action"] == "opened":
-						number = prDetails["number"]
-						url = prDetails["html_url"]
-						username = prDetails["user"]["login"]
-						title = sanitizeText(prDetails["title"])
-						msg = "New Pull Request: <a href=\"{}\">#{} - {}</a> by {}".format(url, number, title, username)
-
-						sendToIntegrations(msg, False)
+					hookPullRequest(payload)
 				elif w == "push":
-					commits = payload["commits"]
-					pusher = payload["pusher"]["name"]
-					branch = payload["ref"][11:]	# eg refs/heads/master
-					latestCommit = commits[0]
-					latestMessage = sanitizeText(latestCommit["message"])
-					if len(latestMessage) > 70:
-						latestMessage = latestMessage[:70]+"..."
-					latestCommitLink = "<a href=\"{}\">{}</a> - <i>{}</i>".format(latestCommit["url"], latestCommit["id"][:6], latestMessage)
-					msg = "{} pushed {} commit{} to {}, including {}".format(
-						pusher, len(commits), "s" if len(commits) > 1 else "", branch, latestCommitLink
-						)
-
-					sendToIntegrations(msg, False)
+					hookPush(payload)
 				elif w == "travis":
-					isPr = payload["pull_request"]
-					if not isPr:
-						status = payload["status_message"].lower()
-						message = ""
-						if status == "fixed":
-							message = "has been fixed"
-						elif status == "broken":
-							message = "has been broken"
-						elif status == "still failing":
-							message = "is still failing"
-						elif status == "errored":
-							message = "has errored"
-
-
-						repoOwner = payload["repository"]["owner_name"]
-
-						if message != "" and repoOwner.lower() == "musescore":
-							commit = payload["commit"];
-							commitURL = "<a href=\"{}{}\">{}</a>".format(GITHUB_COMMIT_URL, commit, commit[:6])
-							branch = payload["branch"]
-							user = payload["committer_name"]
-
-							msg = "MuseScore/{} : {} by {}: build {}".format(branch, commitURL, user, message)
-							sendToIntegrations(msg, True)
+					hookTravis(payload)
 				else:
 					debug("Unhandled webhook {}".format(w), 1)
+
 			debug("Removing {}".format(webhookPath))
 			os.remove(webhookPath)
 
