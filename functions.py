@@ -11,6 +11,7 @@ import traceback
 import os
 import smtplib
 import random
+import re
 from email.mime.text import MIMEText
 
 try:
@@ -305,6 +306,7 @@ def inText(needles, haystack, seperate = False, caseSensitive = False):
 	return False
 
 def beFriendly(text, channel, userId):
+	text = text.lower()
 	possibilities = []
 
 	if inText(("thanks", "thank", "danke", "gracias", "<3"), text) and "musebot" in text:
@@ -313,7 +315,7 @@ def beFriendly(text, channel, userId):
 		possibilities = ("I'm still alive!", "I don't think so", "...")
 	elif inText(("hate", "don't like", "dislike"), text) and "musebot" in text:
 		possibilities = (":(", "Your feedback is appreciated", "ok.")
-	elif inText(("shut up", "be quiet")) and "musebot" in text:
+	elif inText(("shut up", "be quiet"), text) and "musebot" in text:
 		possibilities = ["Ok, I won't respond to you anymore. /unmute to undo."]
 		addMutedUser(userId)
 	elif "happy birthday" in text and "musebot" in text:
