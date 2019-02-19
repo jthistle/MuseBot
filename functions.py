@@ -309,8 +309,10 @@ def beFriendly(text, channel, userId):
 	text = text.lower()
 	possibilities = []
 
-	if inText(("thanks", "thank", "danke", "gracias", "<3"), text) and "musebot" in text:
-		possibilities = ("No, thank <i>you</i>!", "(^ω^)", "No problem")
+	if inText(("thanks", "thank", "danke", "gracias"), text) and "musebot" in text:
+		possibilities = ("No, thank <i>you</i>!", "No problem")
+	elif inText(("love", "<3", "♥️"), text) and "musebot" in text:
+		possibilities = ("♥️", "(^ω^)", "<3")
 	elif inText(("sleeping", "dead", "down", "broken"), text) and "musebot" in text:
 		possibilities = ("I'm still alive!", "I don't think so", "...")
 	elif inText(("hate", "don't like", "dislike"), text) and "musebot" in text:
