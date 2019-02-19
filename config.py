@@ -24,3 +24,5 @@ HELP_TEXT = "To use this bot, mention issues/nodes from musescore.org as #xxxxxx
 
 ABNORMAL_ERRORS = 24
 FATAL_ERROR_COUNT = 500	# After this many errors in 24 hours, stop trying to restart
+
+FRIENDLY = True		# :)

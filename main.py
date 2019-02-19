@@ -66,6 +66,7 @@ def main():
 						if not isMuted:
 							parseNumber = True
 
+							# Found a #, go back and check if pr was mentioned
 							# allow whitespace between pr and #
 							checkEndChar = i-1
 							for j in range(i-1, -1, -1):
@@ -81,6 +82,7 @@ def main():
 						if i == 0:
 							parseCommand = True
 					elif parseCommand:
+						# Both a space and an @ delimit the end of a cmd
 						if char in (" ", "@"):
 							# Handle command
 							cmd = currentCmd.lower()
@@ -145,6 +147,9 @@ def main():
 							currentNum = ""
 							parseNumber = False
 							forcePr = False
+
+				if not isMuted and FRIENDLY:
+					beFriendly(text, channel, userId)
 
 		# Handle webhooks
 		getWebhooks()

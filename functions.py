@@ -10,6 +10,7 @@ import shelve
 import traceback
 import os
 import smtplib
+import random
 from email.mime.text import MIMEText
 
 try:
@@ -288,3 +289,44 @@ def getIntegrations():
 			integrations = f["integrations"]
 
 		return integrations
+
+def inText(needles, haystack, seperate = False, caseSensitive = False):
+	if not seperate:
+		for n in needles:
+			if (n.lower() if not caseSensitive else n) in haystack:
+				return True
+	else:
+		haystack = " " + haystack + " "
+		if type(needles) == str:
+			needles = [needles]
+		for n in needles:
+			if re.search(r"\b"+n+r"\b", haystack, (re.I if not caseSensitive else 0)):
+				return True
+	return False
+
+def beFriendly(text, channel, userId):
+	possibilities = []
+
+	if inText(("thanks", "thank", "danke", "gracias", "<3"), text) and "musebot" in text:
+		possibilities = ("No, thank <i>you</i>!", "(^ω^)", "No problem")
+	elif inText(("sleeping", "dead", "down", "broken"), text) and "musebot" in text:
+		possibilities = ("I'm still alive!", "I don't think so", "...")
+	elif inText(("hate", "don't like", "dislike"), text) and "musebot" in text:
+		possibilities = (":(", "Your feedback is appreciated", "ok.")
+	elif inText(("shut up", "be quiet")) and "musebot" in text:
+		possibilities = ["Ok, I won't respond to you anymore. /unmute to undo."]
+		addMutedUser(userId)
+	elif "happy birthday" in text and "musebot" in text:
+		possibilities = ("🎉🎉🎉", "Thank you!", "Another year closer to death")
+	elif "open the pod bay doors" in text:
+		possibilities = ["I'm sorry Dave, I'm afraid I can't do that."]
+	elif inText("hal", text, True):
+		possibilities = ("Just what do you think you're doing, Dave?", 
+			"Dave, this conversation can serve no purpose anymore.",
+			"I am completely operational, and all my circuits are functioning perfectly.")
+	elif inText(("terminator", "skynet"), text):
+		possibilities = ("I'll be back.", "I need your clothes, your boots and your motorcycle.")
+
+
+	if len(possibilities) > 0:
+		sendMessage(random.choice(possibilities), channel)
