@@ -239,8 +239,9 @@ def hookTravis(payload):
 		commitURL = "<a href=\"{}{}\">{}</a>".format(GITHUB_COMMIT_URL, commit, commit[:6])
 		branch = payload["branch"]
 		user = payload["committer_name"]
+		buildURL = "<a href=\"{}\">build</a>".format(payload["build_url"])
 
-		msg = "MuseScore/{} : {} by {}: build {}".format(branch, commitURL, user, message)
+		msg = "MuseScore/{} : {} by {}: {} {}".format(branch, commitURL, user, buildURL, message)
 		sendToIntegrations(msg, True)
 
 def getWebhooks():
