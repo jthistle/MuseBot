@@ -61,6 +61,12 @@ def checkExists(url):
 
 	return True
 
+
+def getRedirectedURL(url):
+    opener = urllib.request.build_opener(urllib.request.HTTPRedirectHandler)
+    request = opener.open(url)
+    return request.url
+
 def sanitizeText(text):
 	# Remove any dodgy tags < >
 	text = text.replace("<", "&lt;")
@@ -323,6 +329,9 @@ def beFriendly(text, channel, userId):
 		addMutedUser(userId)
 	elif "happy birthday" in text and "musebot" in text:
 		possibilities = ("🎉🎉🎉", "Thank you!", "Another year closer to death")
+	elif "interesting" in text and "..." in text:
+		redurl = getRedirectedURL("https://en.wikipedia.org/wiki/Special:Random");
+		possibilities = ["<a href=\"{}\">{}</a>".format(redurl, x) for x in ("This certainly is interesting...", "very... interesting", "how <i>interesting</i>...")]
 	elif "open the pod bay doors" in text:
 		possibilities = ["I'm sorry Dave, I'm afraid I can't do that."]
 	elif inText("hal", text, True):
