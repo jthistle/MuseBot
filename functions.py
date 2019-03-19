@@ -331,7 +331,7 @@ def beFriendly(text, channel, userId):
 		possibilities = ("🎉🎉🎉", "Thank you!", "Another year closer to death")
 	elif "interesting" in text and "..." in text:
 		redurl = getRedirectedURL("https://en.wikipedia.org/wiki/Special:Random");
-		possibilities = ["<a href=\"{}\">{}</a>".format(redurl, x) for x in ("This certainly is interesting...", "very... interesting", "how <i>interesting</i>...")]
+		possibilities = ["<a href=\"{}\">{}</a>".format(redurl, x) for x in ("This certainly is interesting...", "very... interesting", "how interesting...")]
 	elif "open the pod bay doors" in text:
 		possibilities = ["I'm sorry Dave, I'm afraid I can't do that."]
 	elif inText("hal", text, True):
