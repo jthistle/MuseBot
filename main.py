@@ -162,12 +162,15 @@ if __name__ == "__main__":
 			main()
 		except ApiError as e:
 			debug(traceback.format_exc(), 3)
-			debug("=== {}".format(str(e)))
-			if int(str(e)) in HTTP_ERRORS_FATAL:
-				debug("error code {} is fatal".format(str(e)), 1)
+			debug("=== {}".format(e.code))
+			if e.code == 403 and e.channel != 0:
+				debug("forbidden - removing channel {} from integrations".format(e.channel), 1)
+				unintegrate(e.channel)
+			else if e.code in HTTP_ERRORS_FATAL:
+				debug("error code {} is fatal".format(e.code), 1)
 				break
 			else:
-				debug("error code {} is NOT fatal".format(str(e)), 1)
+				debug("error code {} is NOT fatal".format(e.code), 1)
 		except Exception as e:
 			debug(traceback.format_exc(), 3)
 

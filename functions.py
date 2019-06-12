@@ -24,7 +24,15 @@ except ImportError:
 from config import *
 
 class ApiError(Exception):
-    pass
+	def __init__(self, code, channel):
+		super().__init__()
+		self.code = -1
+		try:
+			self.code = int(code)
+		except:
+			debug("Code is not a number!", 3)
+
+		self.channel = channel
 
 class ApiHandler:
 	def __init__(self):
@@ -46,7 +54,12 @@ class ApiHandler:
 		decodedResponse = json.loads(response.read().decode())
 		if not decodedResponse["ok"]:
 			debug("reponse: {}".format(decodedResponse), 3)
-			raise ApiError(decodedResponse["error_code"])
+
+			channel = 0
+			if "chat_id" in data.keys():
+				channel = data["chat_id"]
+
+			raise ApiError(decodedResponse["error_code"], channel)
 			return False
 
 		return decodedResponse["result"]
@@ -241,7 +254,7 @@ def hookTravis(payload):
 	debug("Repo owner: "+repoOwner)
 
 	if message != "" and repoOwner.lower() == "musescore":
-		commit = payload["commit"];
+		commit = payload["commit"]
 		commitURL = "<a href=\"{}{}\">{}</a>".format(GITHUB_COMMIT_URL, commit, commit[:6])
 		branch = payload["branch"]
 		user = payload["committer_name"]
@@ -330,7 +343,7 @@ def beFriendly(text, channel, userId):
 	elif "happy birthday" in text and "musebot" in text:
 		possibilities = ("🎉🎉🎉", "Thank you!", "Another year closer to death")
 	elif "interesting" in text and "..." in text:
-		redurl = getRedirectedURL("https://en.wikipedia.org/wiki/Special:Random");
+		redurl = getRedirectedURL("https://en.wikipedia.org/wiki/Special:Random")
 		possibilities = ["<a href=\"{}\">{}</a>".format(redurl, x) for x in ("This certainly is interesting...", "very... interesting", "how interesting...")]
 	elif "open the pod bay doors" in text:
 		possibilities = ["I'm sorry Dave, I'm afraid I can't do that."]
