@@ -166,7 +166,7 @@ if __name__ == "__main__":
 			if e.code == 403 and e.channel != 0:
 				debug("forbidden - removing channel {} from integrations".format(e.channel), 1)
 				unintegrate(e.channel)
-			else if e.code in HTTP_ERRORS_FATAL:
+			elif e.code in HTTP_ERRORS_FATAL:
 				debug("error code {} is fatal".format(e.code), 1)
 				break
 			else:
