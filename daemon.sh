@@ -19,23 +19,15 @@ start() {
 	if [ -f $PID_FILE ]; then
 		echo "Service already started!"
 	else
-		"$SRCLOCATION"/main.py &
-        pid=$!
-		echo $pid >> $PID_FILE
-
-        wait $pid
-        
-        # restart on process exit
-        stop
-        echo "Restarting..."
-        start
+		"$SRCLOCATION"/run.sh &
+		echo $! >> $PID_FILE
 	fi
 }
 
 stop() {
 	echo "Stopping..."
 	kill $(cat $PID_FILE)
-	rm $PID_FILE
+	sudo rm $PID_FILE
 	echo "Stopped."
 }
 
