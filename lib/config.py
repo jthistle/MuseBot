@@ -2,6 +2,7 @@
 
 from secrets import *
 
+USERNAME = "musebotbot"
 URL = "api.telegram.org"
 REQUEST_URL = "/bot"+APIKEY+"/"
 REQUEST_DELAY = 1	# second to wait between requests
@@ -9,9 +10,13 @@ RESTART_TIMEOUT = 5
 HEADERS = {'Content-type': 'application/json'}
 HTTP_ERRORS_FATAL = (409, 404)
 
-DEBUG_LEVELS = ("debug", "notice", "warning", "error")
-
+# Possible commands, although any valid string will be parsed
 COMMANDS = ("mute", "unmute", "delete", "integrate", "unintegrate", "help")
+
+# Grammar idents
+PR_IDENT = "pr"
+NODE_IDENT = "node"
+CMD_IDENT = "cmd"
 
 MUSESCORE_NODE_URL = "https://musescore.org/node/"
 GITHUB_PULL_URL = "https://github.com/musescore/MuseScore/pull/"
@@ -26,3 +31,11 @@ ABNORMAL_ERRORS = 24
 FATAL_ERROR_COUNT = 500	# After this many errors in 24 hours, stop trying to restart
 
 FRIENDLY = True		# :)
+
+# Import production config last to overwrite anything if needed
+try:
+	from production import *
+except ImportError:
+	# We aren't running on a production server, so
+	# use default values.
+	from productionDefaults import *

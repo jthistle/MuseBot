@@ -23,48 +23,6 @@ except ImportError:
 
 from config import *
 
-class ApiError(Exception):
-	def __init__(self, code, channel):
-		super().__init__()
-		self.code = -1
-		try:
-			self.code = int(code)
-		except:
-			debug("Code is not a number!", 3)
-
-		self.channel = channel
-
-class ApiHandler:
-	def __init__(self):
-		self.con = http.client.HTTPSConnection(URL, 443)
-
-	def reconnect(self):
-		self.con.close()
-		self.con = http.client.HTTPSConnection(URL, 443)
-
-	def makeRequest(self, cmd, data=None):
-		jsonData = json.dumps(data or {})
-		try:
-			self.con.request("POST", REQUEST_URL+cmd, jsonData, HEADERS)
-		except:
-			debug("An error occurred while carrying out the API request", 1)
-			raise
-
-		response = self.con.getresponse()
-		decodedResponse = json.loads(response.read().decode())
-		if not decodedResponse["ok"]:
-			debug("reponse: {}".format(decodedResponse), 3)
-
-			channel = 0
-			if "chat_id" in data.keys():
-				channel = data["chat_id"]
-
-			raise ApiError(decodedResponse["error_code"], channel)
-			return False
-
-		return decodedResponse["result"]
-
-HANDLER = ApiHandler()
 
 def checkExists(url):
 	try:
@@ -188,7 +146,7 @@ def getMessages(i, chatId, limit=1):
 		log = []
 		if "messageLog" in f.keys():
 			log = f["messageLog"]
-		
+
 		toReturn = []
 		for j in range(limit):
 			while len(log)-i-1 >= 0:
@@ -348,7 +306,7 @@ def beFriendly(text, channel, userId):
 	elif "open the pod bay doors" in text:
 		possibilities = ["I'm sorry Dave, I'm afraid I can't do that."]
 	elif inText("hal", text, True):
-		possibilities = ("Just what do you think you're doing, Dave?", 
+		possibilities = ("Just what do you think you're doing, Dave?",
 			"Dave, this conversation can serve no purpose anymore.",
 			"I am completely operational, and all my circuits are functioning perfectly.")
 	elif inText(("terminator", "skynet"), text):
