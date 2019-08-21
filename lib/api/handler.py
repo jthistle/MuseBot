@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-import getLogger from getLogger
+from ..getLogger import getLogger
 import http.client
 import json
 
-from config import *
+from ..config import *
 
 logger = getLogger()
 

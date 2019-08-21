@@ -19,3 +19,7 @@ that invokes it, if it had been previously muted.
 **integrate** - integrate PR and push notification messages into a chat
 
 **unintegrate** - remove an integration in this chat
+
+## Config
+
+Place any changes to config in `lib/production.py`. This will not be tracked in git, unlike `lib/config.py`.

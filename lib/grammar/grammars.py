@@ -1,76 +1,79 @@
 #!/usr/bin/env python3
 
+"""Generators for the rules that allow the command parser to parse MuseBot messages"""
+
 from ..config import *
-from commandParser import Token
+from .commandParser import Token
 
 def getPRGrammar():
     # PR triggers the pull request parsing
-    prStart = Token(PR_IDENT, "[pP]")
-    end = prStart.addNext(Token(PR_IDENT, "[rR]"))
+    prStart = Token(PR_IDENT, r"[pP]")
+    rChar = prStart.addNext(Token(PR_IDENT, r"[rR]"))
 
     # Branch off to allow whitespace, which can loop back into itself
-    ws = end.addNext(Token(PR_IDENT, "\\s"))
-    ws.addNext(ws)
+    ws = rChar.addNext(Token(PR_IDENT, r"\s"))
+    ws.loopback()
 
     # A hash indicates the start of the number
-    end = end.addNext(Token(PR_IDENT, "#"))
-    ws.addNext(end)
+    hashChar = rChar.addNext(Token(PR_IDENT, r"#"))
+    ws.addNext(hashChar)
 
     # The hash can be followed by whitespace or a digit
-    ws = end.addNext(Token(PR_IDENT, "\\s"))
-    ws.addNext(ws)
+    ws = hashChar.addNext(Token(PR_IDENT, r"\s"))
+    ws.loopback()
 
     # Check for a digit, which can loop back into itself
-    end = end.addNext(Token(PR_IDENT, "[0-9]", collect="number"))
-    end.addNext(end)
-    ws.addNext(end)
+    digit = hashChar.addNext(Token(PR_IDENT, r"[0-9]", collect="number"))
+    ws.addNext(digit)
+    digit.loopback()
 
     # Add a terminator
-    end.addNext(Token(PR_IDENT, "[^0-9]"))
+    digit.addNext(Token(PR_IDENT, r"[^0-9]"))
     return prStart
 
 
 def getNodeGrammar():
     # Node collection is triggered by a hash
-    nodeStart = Token(NODE_IDENT, "#")
+    nodeStart = Token(NODE_IDENT, r"#")
 
     # Loopable whitespace can follow this
-    ws = nodeStart.addNext(Token(NODE_IDENT, "\\s"))
-    ws.addNext(ws)
+    ws = nodeStart.addNext(Token(NODE_IDENT, r"\s"))
+    ws.loopback()
 
-    # A digit must come
-    end = nodeStart.addNext(Token(NODE_IDENT, "[0-9]", collect="number"))
-    ws.addNext(end)
+    # A digit must come, which can loop into iteelf
+    digit = nodeStart.addNext(Token(NODE_IDENT, r"[0-9]", collect="number"))
+    ws.addNext(digit)
+    digit.loopback()
 
     # This is terminated
-    end.addNext(Token(NODE_IDENT, "[^0-9]"))
+    digit.addNext(Token(NODE_IDENT, r"[^0-9]"))
     return nodeStart
 
 
 def getCommandGrammar():
     # Commands are initiated by a forward slash
-    cmdStart = Token(CMD_IDENT, "/")
+    cmdStart = Token(CMD_IDENT, r"/")
 
     # Anything goes, apart from whitespace and @. This loops back
-    end = cmdStart.addNext(Token(CMD_IDENT, "[^@\\s]", collect="cmd"))
-    end.addNext(end)
+    cmdChar = cmdStart.addNext(Token(CMD_IDENT, r"[^@\s]", collect="cmd"))
+    cmdChar.loopback()
 
     # Whitespace ends a command, always
-    ws = end.addNext(Token(CMD_IDENT, "\\s"))
+    ws = cmdChar.addNext(Token(CMD_IDENT, r"\s"))
 
-    # ...but if an @ follows, check for the string `musebotbot` following it
-    end = end.addNext(Token(CMD_IDENT, "@"))
+    # ...but if an @ follows, check for the username string following it
+    last = cmdChar.addNext(Token(CMD_IDENT, r"@"))
 
-    for c in "musebotbot":
-        end = end.addNext(Token(CMD_IDENT, c))
+    for c in USERNAME:
+        last = last.addNext(Token(CMD_IDENT, c))
 
     # And terminate the bot name with whitespace
-    end.addNext(ws)
+    last.addNext(ws)
     return cmdStart
 
 
 def getAllGrammar():
-    master = Token("master", "[^]")
+    master = Token("master", r"\[^]")
 
     master.addNext(getPRGrammar())
     master.addNext(getNodeGrammar())

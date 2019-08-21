@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 
 import logging
-from config import *
+from .config import *
 
-def getLogger():
+def initLogger():
+    """Set up the logger"""
     logger = logging.getLogger("musebot")
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.DEBUG if DEBUG else logging.INFO)
     f = logging.Formatter('%(asctime)s: %(levelname)s: %(message)s')
     h = None
     if DEBUG_TO_FILE:
         h = logging.FileHandler(DEBUG_FILE)
     else:
         h = logging.StreamHandler()
-   h.setFormatter(f)
-   logger.addHandler(h)
+    h.setFormatter(f)
+    logger.addHandler(h)
+    return logger
 
-   return logger
+def getLogger():
+    """Returns a logger configured in a consistent way"""
+    return logging.getLogger("musebot")

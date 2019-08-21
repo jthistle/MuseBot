@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
+"""The command parser and token object"""
+
 import re
+from ..getLogger import getLogger
+
+logger = getLogger()
 
 class Token:
     """A grammatical token in a sequence.
@@ -32,6 +37,11 @@ class Token:
         self.next.append(token)
         return token
 
+    def loopback(self):
+        """Let this token be followed by itself"""
+        self.next.append(self)
+        return self
+
     def terminates(self):
         """If this token terminates the sequence"""
         return len(self.next) == 0
@@ -42,7 +52,7 @@ class Token:
 
     def isValid(self, char):
         """If char matches this token's acceptance criteria"""
-        return self.accept.match(char) == True
+        return self.accept.search(char) is not None
 
     def validNext(self, char):
         """Get the valid token coming directly after this one, for a matching char"""
@@ -69,16 +79,18 @@ class CommandParser:
         """Parse a `string` according to the given grammar"""
         parsed = []
         collections = {}
+        string += " "
         for c in string:
             reset = True
-            if self.currentToken.validNext(c) is not None:
-                self.currentToken = self.currentToken.validNext(c)
+            validNext = self.currentToken.validNext(c)
+            if validNext is not None:
+                self.currentToken = validNext
 
                 # If we need to collect the value of this token, do it
                 if self.currentToken.doCollect():
                     if self.currentToken.collect not in collections:
-                        collections[self.currentToken.collect] = []
-                    collections[self.currentToken.collect].append(c)
+                        collections[self.currentToken.collect] = ""
+                    collections[self.currentToken.collect] += c
 
                 if self.currentToken.terminates():
                     parsed.append(Command(self.currentToken.action, collections))
