@@ -143,8 +143,8 @@ class MuseBot:
 
             return integrations
 
-    def sendToIntegrations(text, previewLinks = True):
-        for ig in getIntegrations():
+    def sendToIntegrations(self, text, previewLinks = True):
+        for ig in self.getIntegrations():
             self.API.sendMessage(text, ig, previewLinks)
 
     def commandHelp(self, message):
@@ -283,7 +283,7 @@ class MuseBot:
             number = prDetails["number"]
             url = prDetails["html_url"]
             username = prDetails["user"]["login"]
-            title = sanitizeText(prDetails["title"])
+            title = helper.sanitizeText(prDetails["title"])
             msg = "New Pull Request: <a href=\"{}\">#{} - {}</a> by {}".format(url, number, title, username)
 
             self.sendToIntegrations(msg, False)
@@ -296,7 +296,7 @@ class MuseBot:
         if len(commits) == 0:
             return
         latestCommit = commits[0]
-        latestMessage = sanitizeText(latestCommit["message"])
+        latestMessage = helper.sanitizeText(latestCommit["message"])
         if len(latestMessage) > 70:
             latestMessage = latestMessage[:70]+"..."
         latestCommitLink = "<a href=\"{}\">{}</a> - <i>{}</i>".format(latestCommit["url"], latestCommit["id"][:6], latestMessage)
@@ -343,15 +343,18 @@ class MuseBot:
             if os.path.exists(webhookPath):
                 logger.debug("Found webhook event {}".format(w))
                 with open(webhookPath, "r") as f:
-                    payload = json.loads(f.read())
-                    if w == "pull_request":
-                        self.handleHookPullRequest(payload)
-                    elif w == "push":
-                        self.handleHookPush(payload)
-                    elif w == "travis":
-                        self.handleHookTravis(payload)
-                    else:
-                        logger.warning("Unhandled webhook {}".format(w))
+                    try:
+                        payload = json.loads(f.read())
+                        if w == "pull_request":
+                            self.handleHookPullRequest(payload)
+                        elif w == "push":
+                            self.handleHookPush(payload)
+                        elif w == "travis":
+                            self.handleHookTravis(payload)
+                        else:
+                            logger.warning("Unhandled webhook {}".format(w))
+                    except json.JSONDecodeError as e:
+                        logger.error("Couldn't read the payload: {}".format(e))
 
                 logger.debug("Removing {}".format(webhookPath))
                 os.remove(webhookPath)
