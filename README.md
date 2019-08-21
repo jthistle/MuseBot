@@ -20,6 +20,40 @@ that invokes it, if it had been previously muted.
 
 **unintegrate** - remove an integration in this chat
 
-## Config
+**help** - get info on how to use MuseBot
 
-Place any changes to config in `lib/production.py`. This will not be tracked in git, unlike `lib/config.py`.
+## Setup
+
+If you want to run MuseBot, you'll need to do a few things. For webhook config, see [the README](./hooks/README.md).
+
+You'll probably need to change some values in `lib/config.py`. To do this, place any changes in `lib/production.py`. This will not be tracked in git, unlike `config.py`.
+
+The values you'll need to specify in `production.py` are:
+
+```python
+# You probably won't have access to the original MuseBot if you're setting this up. Create a new bot on Telegram
+# and set the username here.
+USERNAME = "username_goes_here"
+
+# This will need to be changed. Also make sure you update the value in the webhooks config.
+WEBHOOKS_DIR = "/your/directory/name/here/"
+```
+
+You may also want to change some of the debug settings; see `config.py` to see what you can change.
+
+If you've set everything up correctly, you should be able to copy `daemon.sh` to `/etc/init.d/` and set it up:
+
+```bash
+sudo cp daemon.sh /etc/init.d/musebot
+sudo chown root:root /etc/init.d/musebot
+sudo update-rc.d musebot defaults
+sudo update-rc.d musebot enable
+```
+
+Then, all you need is:
+
+```bash
+sudo service musebot start
+```
+
+and you're up and running!

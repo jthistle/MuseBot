@@ -39,8 +39,7 @@ class Token:
 
     def loopback(self):
         """Let this token be followed by itself"""
-        self.next.append(self)
-        return self
+        return self.addNext(self)
 
     def terminates(self):
         """If this token terminates the sequence"""

@@ -73,6 +73,11 @@ def getCommandGrammar():
 
 
 def getAllGrammar():
+    """Returns a master token with all possible grammars following it.
+
+    The master token should be used with the CommandParser as the starting point.
+    """
+
     master = Token("master", r"\[^]")
 
     master.addNext(getPRGrammar())

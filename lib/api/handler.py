@@ -9,13 +9,14 @@ from ..config import *
 logger = getLogger()
 
 class ApiError(Exception):
+	"""An error that is raised when a request succeeds, but is rejected by the API"""
 	def __init__(self, code, channel):
 		super().__init__()
 		self.code = -1
 		try:
 			self.code = int(code)
 		except:
-			logger.error("Code is not a number!")
+			logger.warning("Code is not a number!")
 
 		self.channel = channel
 
@@ -38,7 +39,7 @@ class ApiHandler:
 		response = self.con.getresponse()
 		decodedResponse = json.loads(response.read().decode())
 		if not decodedResponse.get("ok"):
-			logger.info("Reponse: {}".format(decodedResponse))
+			logger.error("The request succeeded, but there was a bad response: {}".format(decodedResponse))
 
 			channel = 0
 			if "chat_id" in data.keys():

@@ -4,7 +4,7 @@ import logging
 from .config import *
 
 def initLogger():
-    """Set up the logger"""
+    """Set up the logger. Only use this once, preferably before any calls to getLogger."""
     logger = logging.getLogger("musebot")
     logger.setLevel(logging.DEBUG if DEBUG else logging.INFO)
     f = logging.Formatter('%(asctime)s: %(levelname)s: %(message)s')
