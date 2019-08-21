@@ -98,6 +98,6 @@ class CommandParser:
 
             if reset:
                 self.currentToken = self.master
-                self.collections = {}
+                collections = {}
 
         return parsed
