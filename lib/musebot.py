@@ -164,7 +164,9 @@ class MuseBot:
 
     def commandDelete(self, message):
         lastMsgs = self.getMessages(1, message.channel, limit=1)
+        logger.debug("delete")
         if lastMsgs:
+            logger.debug("last messages: {}".format(lastMsgs))
             if int(lastMsgs[0].id) < message.id - 1:
                 # Last message is from bot, delete
                 self.API.deleteMessage(message.channel, message.id - 1)

@@ -24,14 +24,14 @@ if __name__ == "__main__":
         except ApiError as e:
             logger.error("An API error occurred: {}".format(e.code))
             logger.info(traceback.format_exc())
-            if e.code == 403 and e.channel != 0:
-                logger.info("Forbidden - removing channel {} from integrations".format(e.channel))
+            if e.code in (400, 403) and e.channel != 0:
+                logger.info("Forbidden or bad response - removing channel {} from integrations".format(e.channel))
                 instance.unintegrate(e.channel)
             elif e.code in HTTP_ERRORS_FATAL:
                 logger.info("Error code {} is fatal".format(e.code))
                 break
             else:
-                debug("Error code {} is NOT fatal".format(e.code))
+                logger.info("Error code {} is NOT fatal".format(e.code))
         except Exception as e:
             logger.error("An error occurred: {}".format(e))
             logger.info(traceback.format_exc())
