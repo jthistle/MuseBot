@@ -3,7 +3,7 @@ python:
   - "3.6"
 
 install:
-  - sudo tests/setup.sh
+  - sudo ./tests/setup.sh
 
 script:
-  - sudo runTests.py
+  - sudo ./runTests.py

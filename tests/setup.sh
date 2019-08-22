@@ -22,4 +22,6 @@ fi
 mkdir "$QUEUE_TARGET"
 cp "$QUEUE_SRC"/* "$QUEUE_TARGET" -r
 
-rm data.dat
+if $( test -d ./data.dat ); then
+    rm ./data.dat
+fi
