@@ -151,6 +151,7 @@ class MuseBot:
         self.API.sendMessage(HELP_TEXT, message.channel)
 
     def commandIntegrate(self, message):
+        self.API.sendMessage("Integrated push, PR and Travis notifications in this chat!", message.channel)
         self.integrate(message.channel)
 
     def commandUnintegrate(self, message):
