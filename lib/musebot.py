@@ -100,7 +100,6 @@ class MuseBot:
             if "mutedUsers" in f.keys():
                 mutedUsers = f["mutedUsers"]
 
-            debug("muted users: {}".format(str(mutedUsers)))
             if userId in mutedUsers:
                 mutedUsers.remove(userId)
             f["mutedUsers"] = mutedUsers
