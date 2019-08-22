@@ -1,6 +1,10 @@
 __pycache__/
-secrets.py
+lib/secrets.py
+hooks/secrets.php
 log.txt
 data.*
-production.py
+lib/production.py
 updatePi.sh
+/queue
+testLib/
+testQueue/

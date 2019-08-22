@@ -1,13 +1,5 @@
 <?php
-	ini_set('display_errors', 1);
-	ini_set('display_startup_errors', 1);
-	error_reporting(E_ALL);
-
-	define("TOKEN", "temptoken");
-	define("BASE_DIR", "/var/www/html/queue/");
-
-	if (!file_exists(BASE_DIR))
-		mkdir(BASE_DIR, 0744);
+	include_once("./config.php");
 
 	if (!isset($_GET["token"])) {
 		http_response_code(501);
@@ -15,7 +7,7 @@
 	}
 
 	$token = $_GET["token"];
-	if ($token != TOKEN) {
+	if ($token != GITHUB_TOKEN) {
 		http_response_code(501);
 		exit;
 	}
@@ -29,5 +21,4 @@
 	echo "Wrote event file: $payload\n";
 
 	exit;
-
 ?>

@@ -1,0 +1,9 @@
+language: python
+python:
+  - "3.6"
+
+install:
+  - sudo ./tests/setup.sh
+
+script:
+  - sudo ./runTests.py

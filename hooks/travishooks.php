@@ -1,12 +1,5 @@
 <?php
-	ini_set('display_errors', 1);
-	ini_set('display_startup_errors', 1);
-	error_reporting(E_ALL);
-
-	define("BASE_DIR", "/var/www/html/queue/");
-
-	if (!file_exists(BASE_DIR))
-		mkdir(BASE_DIR, 0744);
+	include_once("./config.php");
 
 	$headers = getallheaders();
 	if (isset($headers["Signature"])) {
@@ -22,7 +15,7 @@
 	curl_setopt($ch, CURLOPT_HEADER, 0);
 
 	$result = curl_exec($ch);
-	
+
 	if (curl_error($ch)) {
 		file_put_contents(BASE_DIR."error.txt", "Error: ".curl_error($ch));
 		exit;
