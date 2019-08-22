@@ -37,5 +37,7 @@ DEBUG_FILE = "log.txt"
 DATA_FILE = "data.dat"
 USERNAME = "musebotbot"
 
+TESTING = False
+
 # Import production config last to overwrite anything if needed
 from .production import *

@@ -5,6 +5,7 @@ import http.client
 import json
 
 from ..config import *
+from ..mockers import mockedAPIRequest
 
 logger = getLogger()
 
@@ -28,6 +29,7 @@ class ApiHandler:
 		self.con.close()
 		self.con = http.client.HTTPSConnection(URL, 443)
 
+	@mockedAPIRequest
 	def makeRequest(self, cmd, data=None):
 		jsonData = json.dumps(data or {})
 		try:

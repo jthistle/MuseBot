@@ -1,4 +1,4 @@
-# MuseBot
+# MuseBot [![Build Status](https://travis-ci.com/jthistle/MuseBot.svg?branch=master)](https://travis-ci.com/jthistle/MuseBot)
 A bot for the MuseScore Developers Telegram chat: https://t.me/musescoreeditorchat
 
 ## Features
