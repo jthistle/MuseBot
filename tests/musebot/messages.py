@@ -29,6 +29,7 @@ class MessagesTest(TestBase):
             "/unmute",
             "pr #2030203203",
             "#    478237492374892",
+            "/delete",
         ]
 
         self.counter = randint(2, 50000)
@@ -42,4 +43,4 @@ class MessagesTest(TestBase):
         for msg in messages:
             instance.handleMessage(msg)
 
-test = MessagesTest("Messages", "various messages are handled correctly")
+test = MessagesTest("Messages", "various messages are handled without crashing")

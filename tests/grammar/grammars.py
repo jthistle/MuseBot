@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from ..testbase import TestBase, TestFailure
+from ..testbase import TestBase
 from ..testLib.grammar.grammars import getAllGrammar
 from ..testLib.grammar.commandParser import CommandParser
 
