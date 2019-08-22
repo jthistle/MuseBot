@@ -10,5 +10,5 @@ def mockedAPIRequest(func):
             print("Prevented a request with command {}, data: {}".format(cmd, data))
             return {}
         else:
-            return func(cmd, data)
+            return func(self, cmd, data)
     return wrapper
