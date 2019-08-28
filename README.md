@@ -41,6 +41,12 @@ WEBHOOKS_DIR = "/your/directory/name/here/"
 
 You may also want to change some of the debug settings; see `config.py` to see what you can change.
 
+Once you've created your bot, you'll be given an access token. You can specify this in a file at `lib/secrets.py`, like this:
+
+```python
+APIKEY = "your_api_key_here"
+```
+
 Two other things that will need to be changed are `run.sh` and `daemon.sh`. The constant `SRC_LOCATION` should be updated in both files to look a bit like:
 
 ```bash
