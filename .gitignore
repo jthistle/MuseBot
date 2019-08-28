@@ -2,6 +2,7 @@ __pycache__/
 lib/secrets.py
 hooks/secrets.php
 log.txt
+output.txt
 data.*
 lib/production.py
 updatePi.sh

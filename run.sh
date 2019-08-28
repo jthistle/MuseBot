@@ -19,9 +19,10 @@ pid=-1
 echo "run.sh: running..."
 
 while [ ! $end = true ]; do
-	"$SRC_LOCATION"/main.py &
+	"$SRC_LOCATION"/main.py >> "$SRC_LOCATION"/output.txt &
 	pid=$!
 	wait $pid
+  echo "run.sh: error encountered or closing"
 done
 
 exit 0
