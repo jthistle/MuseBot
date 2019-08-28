@@ -41,6 +41,12 @@ WEBHOOKS_DIR = "/your/directory/name/here/"
 
 You may also want to change some of the debug settings; see `config.py` to see what you can change.
 
+Two other things that will need to be changed are `run.sh` and `daemon.sh`. The constant `SRC_LOCATION` should be updated in both files to look a bit like:
+
+```bash
+SRC_LOCATION="/your/directory/name/here/"
+```
+
 If you've set everything up correctly, you should be able to copy `daemon.sh` to `/etc/init.d/` and set it up:
 
 ```bash

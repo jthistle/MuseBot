@@ -11,7 +11,7 @@
 
 # This script should be copied to /etc/init.d
 
-SRCLOCATION=/home/pi/MuseBot        # Change this to the absolute location of the musebot installation
+SRC_LOCATION=/home/pi/MuseBot        # Change this to the absolute location of the musebot installation
 PID_FILE=/tmp/musebot.pids
 
 start() {
@@ -19,7 +19,7 @@ start() {
 	if [ -f $PID_FILE ]; then
 		echo "Service already started!"
 	else
-		"$SRCLOCATION"/run.sh &
+		"$SRC_LOCATION"/run.sh &
 		echo $! >> $PID_FILE
 	fi
 }

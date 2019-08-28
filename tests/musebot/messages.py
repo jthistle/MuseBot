@@ -10,7 +10,7 @@ class MessagesTest(TestBase):
         return {
             "text": msg,
             "from": {
-                "id": randint(-34313, 18429),
+                "id": self.user,
             },
             "message_id": self.counter,
             "chat": {
@@ -32,6 +32,7 @@ class MessagesTest(TestBase):
             "/delete",
         ]
 
+        self.user = randint(-34313, 18429)
         self.counter = randint(2, 50000)
         self.channel = randint(-3284222, 2844382)
 
