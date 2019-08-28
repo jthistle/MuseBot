@@ -18,6 +18,8 @@ Add a file called secrets.php with something like this in it:
 
     // You may also want to change the webhooks directory. You can do that here.
     // If you do, make sure to update lib/config.py
+	// This directory must be created and chown'd to the user that handles php requests.
+	// This might be www-data, for example, or apache.
     define("BASE_DIR", "/your/directory/name/here/");
 ?>
 ```
